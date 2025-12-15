@@ -1,0 +1,862 @@
+<!doctype html>
+<html lang="uz">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AutoWash CRM Bot — Owner Front-End Demo (Xodimlar + Feedback)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#0b1220;
+      --card: rgba(255,255,255,.06);
+      --card2: rgba(255,255,255,.04);
+      --stroke: rgba(255,255,255,.12);
+      --stroke2: rgba(255,255,255,.18);
+      --text: rgba(255,255,255,.92);
+      --muted: rgba(255,255,255,.68);
+      --muted2: rgba(255,255,255,.50);
+
+      --g:#22c55e;  /* green */
+      --c:#06b6d4;  /* cyan  */
+      --p:#7c3aed;  /* purple */
+      --a:#f59e0b;  /* amber */
+      --r:#ef4444;  /* red   */
+
+      --shadow: 0 18px 60px rgba(0,0,0,.45);
+      --shadow2: 0 10px 28px rgba(0,0,0,.35);
+      --radius: 18px;
+
+      --max: 1220px;
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(900px 520px at 18% 10%, rgba(124,58,237,.22), transparent 55%),
+        radial-gradient(820px 440px at 85% 16%, rgba(6,182,212,.18), transparent 58%),
+        radial-gradient(900px 720px at 55% 88%, rgba(34,197,94,.12), transparent 60%),
+        linear-gradient(180deg,#070b14 0%, var(--bg) 40%, #070b14 100%);
+      overflow-x:hidden;
+    }
+
+    .wrap{max-width:var(--max); margin:0 auto; padding:26px 18px 54px;}
+    .top{
+      display:flex; gap:16px; align-items:flex-start; justify-content:space-between; flex-wrap:wrap;
+      margin-bottom:14px;
+    }
+    .brand{display:flex; gap:12px; align-items:center; min-width: 320px;}
+    .logo{
+      width:46px; height:46px; border-radius:16px;
+      background:
+        radial-gradient(12px 12px at 30% 30%, rgba(255,255,255,.42), transparent 55%),
+        linear-gradient(135deg, rgba(34,197,94,.86), rgba(6,182,212,.82));
+      border:1px solid rgba(255,255,255,.14);
+      box-shadow: 0 14px 40px rgba(34,197,94,.16);
+      position:relative; overflow:hidden;
+    }
+    .logo:after{
+      content:""; position:absolute; inset:-40%;
+      background: linear-gradient(120deg, transparent, rgba(255,255,255,.22), transparent);
+      transform: rotate(18deg);
+      animation: shine 4.8s ease-in-out infinite;
+    }
+    @keyframes shine{
+      0%, 70%{ transform: translateX(-40%) rotate(18deg); opacity:0; }
+      85%{ opacity:1; }
+      100%{ transform: translateX(40%) rotate(18deg); opacity:0; }
+    }
+
+    h1{margin:0; font-size:18px; line-height:1.15; letter-spacing:.2px;}
+    .sub{margin:6px 0 0; color:var(--muted); font-size:13px; line-height:1.45; max-width:860px;}
+
+    .pills{display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end;}
+    .pill{
+      display:flex; align-items:center; gap:8px;
+      padding:10px 12px; border-radius:999px;
+      background: rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.10);
+      box-shadow: var(--shadow2);
+      backdrop-filter: blur(10px);
+      color:var(--muted); font-size:12px; white-space:nowrap;
+    }
+    .dot{width:8px; height:8px; border-radius:99px; background:var(--g); box-shadow:0 0 0 4px rgba(34,197,94,.14)}
+    .dot.c{background:var(--c); box-shadow:0 0 0 4px rgba(6,182,212,.14)}
+    .dot.a{background:var(--a); box-shadow:0 0 0 4px rgba(245,158,11,.14)}
+    .dot.p{background:var(--p); box-shadow:0 0 0 4px rgba(124,58,237,.14)}
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1.05fr .95fr;
+      gap:14px;
+      align-items:start;
+    }
+    @media (max-width: 980px){ .grid{grid-template-columns:1fr;} .pills{justify-content:flex-start;} }
+
+    .card{
+      border-radius: var(--radius);
+      background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
+      border:1px solid rgba(255,255,255,.10);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .head{
+      padding:16px 16px 12px;
+      border-bottom:1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.02);
+      display:flex; align-items:flex-start; justify-content:space-between; gap:12px;
+    }
+    .head h2{margin:0; font-size:14px; letter-spacing:.2px;}
+    .head p{margin:6px 0 0; font-size:12px; color:var(--muted); line-height:1.45; max-width:720px;}
+    .chip{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:8px 10px; border-radius:999px;
+      background: rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.10);
+      color: rgba(255,255,255,.82);
+      font-size:12px; white-space:nowrap;
+    }
+    .mini{width:9px; height:9px; border-radius:99px; background:var(--c); box-shadow:0 0 0 4px rgba(6,182,212,.14)}
+
+    /* Telegram phone mock */
+    .phoneWrap{padding:14px;}
+    .phone{
+      width: 370px;
+      max-width: 100%;
+      margin: 0 auto;
+      border-radius: 28px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.35);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .tgTop{
+      padding:10px 12px;
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      border-bottom:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.02);
+    }
+    .tgTitle{
+      display:flex; align-items:center; gap:10px;
+      min-width: 0;
+    }
+    .ava{
+      width:34px; height:34px; border-radius:14px;
+      background: linear-gradient(135deg, rgba(6,182,212,.85), rgba(124,58,237,.80));
+      border:1px solid rgba(255,255,255,.14);
+      flex:0 0 auto;
+    }
+    .name{min-width:0}
+    .name b{
+      display:block; font-size:12px; letter-spacing:.1px;
+      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    }
+    .name span{
+      display:block; margin-top:2px;
+      font-size:11px; color:var(--muted);
+      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    }
+    .tgIcons{display:flex; gap:10px; opacity:.9}
+    .ico{width:18px; height:18px}
+
+    .screen{
+      padding:12px;
+      background:
+        radial-gradient(380px 220px at 20% 20%, rgba(124,58,237,.10), transparent 55%),
+        radial-gradient(360px 220px at 80% 30%, rgba(6,182,212,.10), transparent 55%),
+        rgba(255,255,255,.02);
+      min-height: 640px;
+      position:relative;
+    }
+
+    .msg{
+      max-width: 92%;
+      padding:10px 11px;
+      border-radius: 16px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.04);
+      box-shadow: var(--shadow2);
+      margin: 8px 0;
+      color: rgba(255,255,255,.86);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+    .msg.bot{border-top-left-radius:8px;}
+    .msg.you{
+      margin-left:auto;
+      background: rgba(34,197,94,.10);
+      border-color: rgba(34,197,94,.18);
+      border-top-right-radius:8px;
+    }
+    .small{font-size:11px; color: var(--muted);}
+    .kbdRow{display:flex; gap:8px; flex-wrap:wrap; margin-top:10px;}
+    .kbd{
+      padding:10px 10px;
+      border-radius: 14px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.03);
+      color: rgba(255,255,255,.85);
+      font-size:12px;
+      cursor:pointer;
+      user-select:none;
+      transition: transform .12s ease, border-color .12s ease;
+    }
+    .kbd:hover{transform: translateY(-1px); border-color: rgba(255,255,255,.18);}
+    .kbd.primary{
+      background: rgba(6,182,212,.10);
+      border-color: rgba(6,182,212,.22);
+    }
+    .kbd.good{
+      background: rgba(34,197,94,.10);
+      border-color: rgba(34,197,94,.22);
+    }
+    .kbd.warn{
+      background: rgba(245,158,11,.10);
+      border-color: rgba(245,158,11,.22);
+    }
+
+    .panel{
+      margin-top:10px;
+      border-radius: 18px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.03);
+      overflow:hidden;
+    }
+    .panelTop{
+      padding:10px 10px;
+      border-bottom:1px solid rgba(255,255,255,.08);
+      display:flex; align-items:flex-start; justify-content:space-between; gap:10px;
+      background: rgba(255,255,255,.02);
+    }
+    .panelTop b{font-size:12px}
+    .panelTop span{font-size:11px; color: var(--muted); display:block; margin-top:3px}
+    .miniTag{
+      font-size:11px;
+      padding:5px 8px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.10);
+      color:var(--muted);
+      background: rgba(255,255,255,.02);
+      white-space:nowrap;
+    }
+    .miniTag.g{border-color: rgba(34,197,94,.22); color: rgba(198,255,221,.84); background: rgba(34,197,94,.07);}
+    .miniTag.c{border-color: rgba(6,182,212,.25); color: rgba(190,250,255,.82); background: rgba(6,182,212,.08);}
+    .miniTag.a{border-color: rgba(245,158,11,.22); color: rgba(255,233,198,.86); background: rgba(245,158,11,.07);}
+    .miniTag.r{border-color: rgba(239,68,68,.26); color: rgba(255,210,210,.88); background: rgba(239,68,68,.08);}
+
+    .panelBody{padding:10px;}
+    .rows{display:grid; gap:8px;}
+    .row{
+      border-radius: 14px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.02);
+      padding:10px;
+      display:flex; justify-content:space-between; gap:10px; align-items:flex-start;
+    }
+    .row b{display:block; font-size:12px;}
+    .row .meta{margin-top:4px; color:var(--muted); font-size:11px; line-height:1.35;}
+    .row .right{display:flex; gap:6px; flex-wrap:wrap; justify-content:flex-end;}
+    .btn{
+      font-size:11px;
+      padding:7px 9px;
+      border-radius: 12px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.03);
+      color: rgba(255,255,255,.84);
+      cursor:pointer;
+    }
+    .btn.g{background: rgba(34,197,94,.10); border-color: rgba(34,197,94,.22);}
+    .btn.c{background: rgba(6,182,212,.10); border-color: rgba(6,182,212,.22);}
+    .btn.a{background: rgba(245,158,11,.10); border-color: rgba(245,158,11,.22);}
+    .btn.r{background: rgba(239,68,68,.08); border-color: rgba(239,68,68,.22);}
+
+    /* Bottom nav (Telegram Mini App feel) */
+    .nav{
+      position: sticky;
+      bottom: 0;
+      display:grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap:8px;
+      padding:10px;
+      background: rgba(10,14,24,.86);
+      border-top:1px solid rgba(255,255,255,.10);
+      backdrop-filter: blur(10px);
+    }
+    .nav button{
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.03);
+      color: rgba(255,255,255,.78);
+      border-radius: 14px;
+      padding:10px 8px;
+      cursor:pointer;
+      font-size:11px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      transition: transform .12s ease, border-color .12s ease, background .12s ease;
+    }
+    .nav button:hover{transform: translateY(-1px); border-color: rgba(255,255,255,.18);}
+    .nav button.active{
+      background: rgba(6,182,212,.10);
+      border-color: rgba(6,182,212,.22);
+      color: rgba(255,255,255,.92);
+      box-shadow: var(--shadow2);
+    }
+    .nav svg{width:16px; height:16px; opacity:.95}
+
+    /* Right side: explanation cards */
+    .side{display:grid; gap:14px;}
+    .pad{padding:14px;}
+    .kpiGrid{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:10px;}
+    .kpi{
+      border-radius: 14px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.03);
+      padding:10px;
+      position:relative;
+      overflow:hidden;
+    }
+    .kpi:before{
+      content:""; position:absolute; inset:-1px;
+      background: radial-gradient(220px 80px at 20% 0%, rgba(6,182,212,.14), transparent 55%);
+      opacity:.85; pointer-events:none;
+    }
+    .kpi:nth-child(2):before{background: radial-gradient(220px 80px at 20% 0%, rgba(34,197,94,.14), transparent 55%);}
+    .kpi:nth-child(3):before{background: radial-gradient(220px 80px at 20% 0%, rgba(245,158,11,.14), transparent 55%);}
+    .kpi:nth-child(4):before{background: radial-gradient(220px 80px at 20% 0%, rgba(124,58,237,.14), transparent 55%);}
+
+    .kpi .l{position:relative; z-index:1; font-size:11px; color:var(--muted);}
+    .kpi .v{position:relative; z-index:1; margin-top:6px; font-size:16px; font-weight:900;}
+    .kpi .h{position:relative; z-index:1; margin-top:6px; font-size:11px; color:var(--muted2); line-height:1.35;}
+
+    .callout{
+      margin-top:10px;
+      border-radius: 16px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(124,58,237,.08);
+      padding:12px;
+      color: rgba(255,255,255,.86);
+      font-size:12px;
+      line-height:1.45;
+    }
+
+    .toast{
+      position: fixed;
+      right: 18px; bottom: 18px;
+      background: rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.14);
+      backdrop-filter: blur(12px);
+      padding: 10px 12px;
+      border-radius: 14px;
+      box-shadow: var(--shadow2);
+      color: rgba(255,255,255,.86);
+      font-size: 12px;
+      display:none;
+      max-width: 380px;
+      z-index: 999;
+    }
+
+    @media print{
+      .nav, .pills, .toast{display:none !important;}
+      body{background:#fff; color:#000;}
+      .card{box-shadow:none;}
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <div class="top">
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div>
+          <h1>Owner CRM Bot — Full Front-End (Xodimlar + Mijoz feedback)</h1>
+          <p class="sub">
+            Bu demo sahifa avtomoyka egalariga ko‘rsatish uchun: CRM Bot’da <b>xodim qo‘shish</b>, <b>har bir xizmatga xodim biriktirish</b> va
+            <b>mijoz feedback’ini xodim darajasida yig‘ish</b> qanday ko‘rinishini vizual tarzda beradi.
+          </p>
+        </div>
+      </div>
+      <div class="pills">
+        <div class="pill"><span class="dot"></span>Xodimlar</div>
+        <div class="pill"><span class="dot c"></span>Jadval / Navbat</div>
+        <div class="pill"><span class="dot a"></span>Feedback / Reyting</div>
+        <div class="pill"><span class="dot p"></span>Owner nazorati</div>
+      </div>
+    </div>
+
+    <div class="grid">
+      <!-- LEFT: Telegram bot front-end mock -->
+      <div class="card">
+        <div class="head">
+          <div>
+            <h2>Telegram CRM Bot interfeysi (Owner / Admin ko‘rinishi)</h2>
+            <p>Pastdagi menyu orqali ekranlar almashadi: Dashboard → Bronlar → Xodimlar → Feedback → Sozlamalar</p>
+          </div>
+          <div class="chip"><span class="mini"></span>UI Demo</div>
+        </div>
+
+        <div class="phoneWrap">
+          <div class="phone">
+            <div class="tgTop">
+              <div class="tgTitle">
+                <div class="ava"></div>
+                <div class="name">
+                  <b>AutoWash CRM Bot</b>
+                  <span id="crumb">Dashboard • Bugun</span>
+                </div>
+              </div>
+              <div class="tgIcons" aria-hidden="true">
+                <svg class="ico" viewBox="0 0 24 24" fill="none"><path d="M11 19a7 7 0 1 1 0-14 7 7 0 0 1 0 14Z" stroke="rgba(255,255,255,.78)" stroke-width="1.6"/><path d="M20 20l-3.5-3.5" stroke="rgba(255,255,255,.78)" stroke-width="1.6" stroke-linecap="round"/></svg>
+                <svg class="ico" viewBox="0 0 24 24" fill="none"><path d="M12 6v6l4 2" stroke="rgba(255,255,255,.78)" stroke-width="1.6" stroke-linecap="round"/><path d="M12 21a9 9 0 1 0-9-9 9 9 0 0 0 9 9Z" stroke="rgba(255,255,255,.78)" stroke-width="1.6"/></svg>
+              </div>
+            </div>
+
+            <div class="screen" id="screen">
+              <!-- Bot welcome message -->
+              <div class="msg bot">
+                <b>Salom, Egasi 👋</b><br/>
+                Bugun avtomoykangizni boshqarish: bronlar, navbat, postlar, xodimlar va feedback — hammasi shu yerda.
+                <div class="small" style="margin-top:6px;">Maslahat: pastdagi menyudan bo‘limni tanlang.</div>
+              </div>
+
+              <!-- Dynamic content goes here -->
+              <div id="view"></div>
+            </div>
+
+            <!-- Bottom nav -->
+            <div class="nav" role="navigation" aria-label="Bot menyusi">
+              <button class="active" data-view="dash" title="Dashboard">
+                <svg viewBox="0 0 24 24" fill="none"><path d="M4 12h7v8H4v-8Zm9-8h7v16h-7V4Z" stroke="rgba(255,255,255,.85)" stroke-width="1.6" stroke-linejoin="round"/></svg>
+                Bugun
+              </button>
+              <button data-view="book" title="Bronlar">
+                <svg viewBox="0 0 24 24" fill="none"><path d="M7 7h10v4H7V7Zm0 6h10v4H7v-4Z" stroke="rgba(255,255,255,.85)" stroke-width="1.6" stroke-linejoin="round"/><path d="M5 4.8c0-.44.36-.8.8-.8h12.4c.44 0 .8.36.8.8v14.4c0 .44-.36.8-.8.8H5.8c-.44 0-.8-.36-.8-.8V4.8Z" stroke="rgba(255,255,255,.65)" stroke-width="1.4"/></svg>
+                Bronlar
+              </button>
+              <button data-view="staff" title="Xodimlar">
+                <svg viewBox="0 0 24 24" fill="none"><path d="M16 11a4 4 0 1 0-8 0" stroke="rgba(255,255,255,.85)" stroke-width="1.6" stroke-linecap="round"/><path d="M4 20c1.8-4 13.2-4 16 0" stroke="rgba(255,255,255,.65)" stroke-width="1.6" stroke-linecap="round"/><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z" stroke="rgba(255,255,255,.65)" stroke-width="1.4"/></svg>
+                Xodimlar
+              </button>
+              <button data-view="fb" title="Feedback">
+                <svg viewBox="0 0 24 24" fill="none"><path d="M7 18l-3 3V5.8c0-.44.36-.8.8-.8h14.4c.44 0 .8.36.8.8V16.2c0 .44-.36.8-.8.8H7Z" stroke="rgba(255,255,255,.78)" stroke-width="1.6" stroke-linejoin="round"/><path d="M8 9h9M8 12h7" stroke="rgba(255,255,255,.78)" stroke-width="1.6" stroke-linecap="round"/></svg>
+                Feedback
+              </button>
+              <button data-view="set" title="Sozlamalar">
+                <svg viewBox="0 0 24 24" fill="none"><path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z" stroke="rgba(255,255,255,.78)" stroke-width="1.6"/><path d="M19 12a7 7 0 0 0-.1-1l2-1.2-2-3.4-2.3.7a7.4 7.4 0 0 0-1.7-1l-.3-2.4H10l-.3 2.4a7.4 7.4 0 0 0-1.7 1L5.7 6.4l-2 3.4 2 1.2A7 7 0 0 0 5 12c0 .34.03.67.1 1l-2 1.2 2 3.4 2.3-.7c.52.4 1.1.73 1.7 1l.3 2.4h4.4l.3-2.4c.6-.27 1.18-.6 1.7-1l2.3.7 2-3.4-2-1.2c.07-.33.1-.66.1-1Z" stroke="rgba(255,255,255,.65)" stroke-width="1.2" stroke-linejoin="round"/></svg>
+                Sozlama
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: Owner explanation -->
+      <div class="side">
+        <div class="card">
+          <div class="head">
+            <div>
+              <h2>Owner’ga qiymat (xodim feedback bilan)</h2>
+              <p>Feedback endi faqat “avtomoyka” emas — har bir xodim bo‘yicha ham ko‘rinadi.</p>
+            </div>
+            <div class="chip"><span class="mini" style="background:var(--a); box-shadow:0 0 0 4px rgba(245,158,11,.14)"></span>Value</div>
+          </div>
+          <div class="pad">
+            <div class="kpiGrid">
+              <div class="kpi">
+                <div class="l">Sifat nazorati</div>
+                <div class="v">Xodim reytingi</div>
+                <div class="h">Kim yaxshi ishlayapti, kimga trening kerak — aniq ko‘rinadi.</div>
+              </div>
+              <div class="kpi">
+                <div class="l">Motivatsiya</div>
+                <div class="v">Bonus/ KPI</div>
+                <div class="h">Reyting va feedback asosida bonus va smena taqsimoti.</div>
+              </div>
+              <div class="kpi">
+                <div class="l">Tezkor muammo</div>
+                <div class="v">Negative alert</div>
+                <div class="h">Past baho bo‘lsa — owner/adminga ogohlantirish.</div>
+              </div>
+              <div class="kpi">
+                <div class="l">Brend</div>
+                <div class="v">Reyting oshadi</div>
+                <div class="h">Sifat oshsa — marketplace’da ko‘rinish ham kuchayadi.</div>
+              </div>
+            </div>
+
+            <div class="callout">
+              <b>Qanday yig‘iladi?</b> “Done” bo‘lgandan keyin mijozga: 1) umumiy xizmat bahosi 2) biriktirilgan xodim(lar) bo‘yicha baho (⭐ + qisqa izoh).
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="head">
+            <div>
+              <h2>Demo rejim</h2>
+              <p>Pastdagi menyudan bo‘limlarni bosib ko‘ring.</p>
+            </div>
+            <div class="chip"><span class="mini" style="background:var(--p); box-shadow:0 0 0 4px rgba(124,58,237,.14)"></span>Try</div>
+          </div>
+          <div class="pad" style="color:var(--muted); font-size:12px; line-height:1.5;">
+            <ul style="margin:0 0 0 18px; padding:0;">
+              <li><b>Xodimlar</b>: qo‘shish, rollar (Admin / Usta), smena, postlar.</li>
+              <li><b>Bronlar</b>: check-in, post biriktirish, xodim biriktirish.</li>
+              <li><b>Feedback</b>: xodim reytingi + izohlar, top performers.</li>
+            </ul>
+            <div style="margin-top:10px;">
+              <button class="btn c" onclick="window.print()">Print / PDF</button>
+              <button class="btn a" onclick="toast('Demo: Ownerga “Xodim reytingi” report')">Report misol</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const view = document.getElementById("view");
+    const crumb = document.getElementById("crumb");
+    const toastEl = document.getElementById("toast");
+
+    function toast(msg){
+      toastEl.textContent = msg;
+      toastEl.style.display = "block";
+      clearTimeout(toast._t);
+      toast._t = setTimeout(()=> toastEl.style.display="none", 2400);
+    }
+
+    // --- Views (front-end demo screens) ---
+    function vDashboard(){
+      crumb.textContent = "Dashboard • Bugun";
+      view.innerHTML = `
+        <div class="panel">
+          <div class="panelTop">
+            <div>
+              <b>Bugungi ko‘rsatkichlar</b>
+              <span>Real vaqt: bronlar, post bandligi, no-show, reyting</span>
+            </div>
+            <div class="miniTag c">Live</div>
+          </div>
+          <div class="panelBody">
+            <div class="rows">
+              <div class="row">
+                <div>
+                  <b>Bronlar</b>
+                  <div class="meta">Bugun: 18 • Tasdiqlangan: 14 • Kutilyapti: 3</div>
+                </div>
+                <div class="right">
+                  <span class="miniTag g">+12%</span>
+                  <span class="miniTag c">Trend</span>
+                </div>
+              </div>
+              <div class="row">
+                <div>
+                  <b>Utilization (post bandligi)</b>
+                  <div class="meta">Post #1: 78% • Post #2: 64% • Detail: 52%</div>
+                </div>
+                <div class="right">
+                  <span class="miniTag a">Pik: 18:00–21:00</span>
+                </div>
+              </div>
+              <div class="row">
+                <div>
+                  <b>No-show</b>
+                  <div class="meta">Bugun: 1 (5.6%) • O‘tgan hafta: 9.2%</div>
+                </div>
+                <div class="right">
+                  <span class="miniTag g">Yaxshilandi</span>
+                </div>
+              </div>
+              <div class="row">
+                <div>
+                  <b>O‘rtacha reyting</b>
+                  <div class="meta">Avtomoyka: 4.6 ⭐ • Xodimlar: 4.5 ⭐</div>
+                </div>
+                <div class="right">
+                  <span class="miniTag c">Feedback</span>
+                  <span class="miniTag g">Top: Javlon (4.9)</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="kbdRow">
+              <div class="kbd primary" onclick="toast('Tezkor: Bugungi bronlar ro‘yxati ochildi')">Bugungi bronlar</div>
+              <div class="kbd good" onclick="toast('Tezkor: Xodim qo‘shish oynasi')">+ Xodim qo‘shish</div>
+              <div class="kbd warn" onclick="toast('Tezkor: No-show siyosati (depozit/eslatma)')">No-show siyosati</div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function vBookings(){
+      crumb.textContent = "Bronlar • Jadval";
+      view.innerHTML = `
+        <div class="panel">
+          <div class="panelTop">
+            <div>
+              <b>Bronlar (Bugun)</b>
+              <span>Check-in → Post → Xodim biriktirish → Done</span>
+            </div>
+            <div class="miniTag c">Queue</div>
+          </div>
+          <div class="panelBody">
+            <div class="rows">
+              <div class="row">
+                <div>
+                  <b>18:00 • Kompleks yuvish</b>
+                  <div class="meta">Mijoz: +998 ** *** ** 21 • Status: <b>Arrived</b></div>
+                  <div class="meta">Post: — • Xodim: —</div>
+                </div>
+                <div class="right">
+                  <button class="btn c" onclick="toast('Check-in tasdiqlandi')">Check-in</button>
+                  <button class="btn a" onclick="toast('Post #1 biriktirildi')">Post #1</button>
+                  <button class="btn g" onclick="toast('Xodim: Javlon biriktirildi')">Xodim</button>
+                </div>
+              </div>
+
+              <div class="row">
+                <div>
+                  <b>18:30 • Interior detailing</b>
+                  <div class="meta">Mijoz: +998 ** *** ** 03 • Status: <b>Confirmed</b></div>
+                  <div class="meta">Post: Detail • Xodim: Madina</div>
+                </div>
+                <div class="right">
+                  <button class="btn c" onclick="toast('Mijoz kelishini kutyapmiz')">Reminder</button>
+                  <button class="btn r" onclick="toast('Bekor qilish sababi tanlandi')">Cancel</button>
+                </div>
+              </div>
+
+              <div class="row">
+                <div>
+                  <b>19:00 • Ekspress yuvish</b>
+                  <div class="meta">Mijoz: +998 ** *** ** 77 • Status: <b>In service</b></div>
+                  <div class="meta">Post: #2 • Xodim: Azamat</div>
+                </div>
+                <div class="right">
+                  <button class="btn g" onclick="toast('Done: Mijozga feedback so‘rovi yuborildi')">Done</button>
+                  <button class="btn a" onclick="toast('Bonus: xodim ishlashi qayd etildi')">Log</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="msg bot" style="margin-top:10px;">
+              <b>Operator eslatmasi:</b> “Done” bosilgach, mijozga 2 bosqichli feedback ketadi:
+              1) Umumiy xizmat (⭐) 2) Xodim(lar) (⭐ + izoh).
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function vStaff(){
+      crumb.textContent = "Xodimlar • Boshqaruv";
+      view.innerHTML = `
+        <div class="panel">
+          <div class="panelTop">
+            <div>
+              <b>Xodimlar ro‘yxati</b>
+              <span>Qo‘shish • Rollar • Smena • Reyting</span>
+            </div>
+            <div class="miniTag g">Team</div>
+          </div>
+          <div class="panelBody">
+            <div class="kbdRow">
+              <div class="kbd good" onclick="toast('Forma: Ism, telefon, rol, smena, post')">+ Xodim qo‘shish</div>
+              <div class="kbd primary" onclick="toast('Rollar: Admin / Usta / Kassir (ixtiyoriy)')">Rollar</div>
+              <div class="kbd warn" onclick="toast('Smena: 09:00–18:00 / 18:00–02:00')">Smena</div>
+            </div>
+
+            <div class="rows" style="margin-top:10px;">
+              <div class="row">
+                <div>
+                  <b>Javlon • Usta</b>
+                  <div class="meta">Smena: 18:00–02:00 • Post: #1/#2</div>
+                  <div class="meta">Reyting: <b>4.9</b> ⭐ • 126 feedback</div>
+                </div>
+                <div class="right">
+                  <button class="btn c" onclick="toast('Profil ochildi: tarix, bronlar, feedback')">Profil</button>
+                  <button class="btn a" onclick="toast('Smena o‘zgartirish')">Smena</button>
+                  <button class="btn r" onclick="toast('Xodimni vaqtincha o‘chirib qo‘yish')">Disable</button>
+                </div>
+              </div>
+
+              <div class="row">
+                <div>
+                  <b>Madina • Detail master</b>
+                  <div class="meta">Smena: 09:00–18:00 • Post: Detail</div>
+                  <div class="meta">Reyting: <b>4.7</b> ⭐ • 84 feedback</div>
+                </div>
+                <div class="right">
+                  <button class="btn c" onclick="toast('Profil ochildi')">Profil</button>
+                  <button class="btn a" onclick="toast('Bonus KPI sozlandi')">Bonus</button>
+                </div>
+              </div>
+
+              <div class="row">
+                <div>
+                  <b>Azamat • Usta</b>
+                  <div class="meta">Smena: 18:00–02:00 • Post: #2</div>
+                  <div class="meta">Reyting: <b>4.3</b> ⭐ • 59 feedback</div>
+                </div>
+                <div class="right">
+                  <button class="btn c" onclick="toast('Profil ochildi')">Profil</button>
+                  <button class="btn a" onclick="toast('Trening reja: sifat checklist')">Trening</button>
+                  <button class="btn r" onclick="toast('Ogohlantirish: past reyting trend')">Alert</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="msg bot" style="margin-top:10px;">
+              <b>Owner uchun:</b> xodim reytingi past bo‘lsa — avtomatik “alert” va sabablar (izohlar) bilan ko‘rsatiladi.
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function vFeedback(){
+      crumb.textContent = "Feedback • Xodimlar bo‘yicha";
+      view.innerHTML = `
+        <div class="panel">
+          <div class="panelTop">
+            <div>
+              <b>Feedback markazi</b>
+              <span>Xodim reytingi • Izohlar • Top / Risk xodimlar</span>
+            </div>
+            <div class="miniTag a">Quality</div>
+          </div>
+          <div class="panelBody">
+            <div class="rows">
+              <div class="row">
+                <div>
+                  <b>Top xodimlar (hafta)</b>
+                  <div class="meta">1) Javlon 4.9 ⭐ • 2) Madina 4.7 ⭐ • 3) Aziz 4.6 ⭐</div>
+                </div>
+                <div class="right">
+                  <span class="miniTag g">Bonus tavsiya</span>
+                </div>
+              </div>
+
+              <div class="row">
+                <div>
+                  <b>Risk: past reyting trend</b>
+                  <div class="meta">Azamat: 4.3 ⭐ (−0.4) • Sabab: “ichki tozalash sust”, “kechikish”</div>
+                </div>
+                <div class="right">
+                  <span class="miniTag r">Alert</span>
+                  <button class="btn a" onclick="toast('Action plan: trening + checklist')">Action</button>
+                </div>
+              </div>
+
+              <div class="row">
+                <div>
+                  <b>Yangi izohlar</b>
+                  <div class="meta">“Javlon juda muloyim, tez ishladi.” • “Madina detailing zo‘r qildi.”</div>
+                </div>
+                <div class="right">
+                  <button class="btn c" onclick="toast('Izohlarni to‘liq ko‘rish')">Ko‘rish</button>
+                  <button class="btn g" onclick="toast('Mijozga rahmat xabari yuborildi')">Rahmat</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="msg bot" style="margin-top:10px;">
+              <b>Feedback formati:</b><br/>
+              • Umumiy xizmat: ⭐ 1–5<br/>
+              • Xodim: ⭐ 1–5 + 1-2 jumla izoh (ixtiyoriy)<br/>
+              • “Shikoyat” bo‘lsa — owner/adminga darhol xabar
+            </div>
+
+            <div class="kbdRow">
+              <div class="kbd primary" onclick="toast('Filtr: xodim bo‘yicha')">Filtr: xodim</div>
+              <div class="kbd warn" onclick="toast('Filtr: past baholar (≤3⭐)')">Filtr: ≤3⭐</div>
+              <div class="kbd good" onclick="toast('Export: haftalik report (PDF/Excel)')">Export report</div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function vSettings(){
+      crumb.textContent = "Sozlamalar • Avtomoyka";
+      view.innerHTML = `
+        <div class="panel">
+          <div class="panelTop">
+            <div>
+              <b>Sozlamalar</b>
+              <span>Postlar • Xizmatlar • No-show siyosati • Bildirishnomalar</span>
+            </div>
+            <div class="miniTag c">Config</div>
+          </div>
+          <div class="panelBody">
+            <div class="rows">
+              <div class="row">
+                <div>
+                  <b>Postlar (bay)</b>
+                  <div class="meta">Post #1, Post #2, Detail • Buffer: 5 daqiqa</div>
+                </div>
+                <div class="right">
+                  <button class="btn c" onclick="toast('Post qo‘shish: +1')">+ Post</button>
+                  <button class="btn a" onclick="toast('Buffer vaqt sozlandi')">Buffer</button>
+                </div>
+              </div>
+              <div class="row">
+                <div>
+                  <b>No-show siyosati</b>
+                  <div class="meta">Timer: +10 daqiqa • Pik soatlarda depozit: yoqish/ochirish</div>
+                </div>
+                <div class="right">
+                  <button class="btn a" onclick="toast('Depozit: ON (18:00–21:00)')">Depozit</button>
+                  <button class="btn c" onclick="toast('Reminder: 60m + 15m')">Reminder</button>
+                </div>
+              </div>
+              <div class="row">
+                <div>
+                  <b>Feedback sozlamalari</b>
+                  <div class="meta">Umumiy + xodim bo‘yicha baho • Past bahoda alert</div>
+                </div>
+                <div class="right">
+                  <button class="btn g" onclick="toast('Alert: ≤3⭐ bo‘lsa — ownerga xabar')">Alert</button>
+                  <button class="btn c" onclick="toast('Savollar: 2 bosqichli')">Form</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="msg bot" style="margin-top:10px;">
+              <b>Owner uchun tavsiya:</b> Pik soatlarda depozit va kuchli reminder → no-show kamayadi → utilization oshadi.
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    const views = { dash:vDashboard, book:vBookings, staff:vStaff, fb:vFeedback, set:vSettings };
+
+    // Nav handlers
+    document.querySelectorAll(".nav button").forEach(btn=>{
+      btn.addEventListener("click", ()=>{
+        document.querySelectorAll(".nav button").forEach(b=>b.classList.remove("active"));
+        btn.classList.add("active");
+        const key = btn.dataset.view;
+        views[key]();
+        toast("Ekran: " + btn.textContent.trim());
+      });
+    });
+
+    // Init default view
+    vDashboard();
+  </script>
+</body>
+</html>
