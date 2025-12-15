@@ -1,0 +1,642 @@
+<!doctype html>
+<html lang="uz">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AutoWash CRM Bot — Avtomoyka Egasi uchun Taqdimot (HTML)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#0b1220;
+      --card: rgba(255,255,255,.06);
+      --card2: rgba(255,255,255,.04);
+      --stroke: rgba(255,255,255,.12);
+      --stroke2: rgba(255,255,255,.18);
+      --text: rgba(255,255,255,.92);
+      --muted: rgba(255,255,255,.68);
+      --muted2: rgba(255,255,255,.52);
+
+      --a:#7c3aed; /* purple */
+      --b:#22c55e; /* green  */
+      --c:#06b6d4; /* cyan   */
+      --d:#f59e0b; /* amber  */
+      --r:#ef4444; /* red    */
+
+      --shadow: 0 18px 60px rgba(0,0,0,.45);
+      --shadow2: 0 10px 28px rgba(0,0,0,.35);
+      --radius: 18px;
+
+      --max: 1200px;
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(900px 520px at 18% 10%, rgba(124,58,237,.24), transparent 55%),
+        radial-gradient(820px 440px at 85% 16%, rgba(6,182,212,.18), transparent 58%),
+        radial-gradient(900px 720px at 55% 88%, rgba(34,197,94,.12), transparent 60%),
+        linear-gradient(180deg,#070b14 0%, var(--bg) 40%, #070b14 100%);
+      overflow-x:hidden;
+    }
+
+    /* Top bar */
+    .wrap{max-width:var(--max); margin:0 auto; padding:26px 18px 54px;}
+    .top{
+      display:flex; gap:16px; align-items:flex-start; justify-content:space-between; flex-wrap:wrap;
+      margin-bottom:14px;
+    }
+    .brand{display:flex; gap:12px; align-items:center; min-width: 320px;}
+    .logo{
+      width:44px; height:44px; border-radius:14px;
+      background:
+        radial-gradient(12px 12px at 30% 30%, rgba(255,255,255,.42), transparent 55%),
+        linear-gradient(135deg, rgba(34,197,94,.85), rgba(6,182,212,.80));
+      border:1px solid rgba(255,255,255,.14);
+      box-shadow: 0 14px 40px rgba(34,197,94,.16);
+      position:relative; overflow:hidden;
+    }
+    .logo:after{
+      content:""; position:absolute; inset:-40%;
+      background: linear-gradient(120deg, transparent, rgba(255,255,255,.22), transparent);
+      transform: rotate(18deg);
+      animation: shine 4.8s ease-in-out infinite;
+    }
+    @keyframes shine{
+      0%, 70%{ transform: translateX(-40%) rotate(18deg); opacity:0; }
+      85%{ opacity:1; }
+      100%{ transform: translateX(40%) rotate(18deg); opacity:0; }
+    }
+
+    h1{margin:0; font-size:18px; line-height:1.15; letter-spacing:.2px;}
+    .sub{margin:6px 0 0; color:var(--muted); font-size:13px; line-height:1.45; max-width:820px;}
+
+    .pills{display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end;}
+    .pill{
+      display:flex; align-items:center; gap:8px;
+      padding:10px 12px; border-radius:999px;
+      background: rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.10);
+      box-shadow: var(--shadow2);
+      backdrop-filter: blur(10px);
+      color:var(--muted); font-size:12px; white-space:nowrap;
+    }
+    .dot{width:8px; height:8px; border-radius:99px; background:var(--b); box-shadow:0 0 0 4px rgba(34,197,94,.14)}
+    .dot.c{background:var(--c); box-shadow:0 0 0 4px rgba(6,182,212,.14)}
+    .dot.d{background:var(--d); box-shadow:0 0 0 4px rgba(245,158,11,.14)}
+
+    /* Layout */
+    .grid{
+      display:grid;
+      grid-template-columns: 1.25fr .75fr;
+      gap:14px;
+      align-items:start;
+    }
+    @media (max-width: 980px){ .grid{grid-template-columns:1fr;} .pills{justify-content:flex-start;} }
+
+    .card{
+      border-radius: var(--radius);
+      background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
+      border:1px solid rgba(255,255,255,.10);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .head{
+      padding:16px 16px 12px;
+      border-bottom:1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.02);
+      display:flex; align-items:flex-start; justify-content:space-between; gap:12px;
+    }
+    .head h2{margin:0; font-size:14px; letter-spacing:.2px;}
+    .head p{margin:6px 0 0; font-size:12px; color:var(--muted); line-height:1.45; max-width:720px;}
+    .chip{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:8px 10px; border-radius:999px;
+      background: rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.10);
+      color: rgba(255,255,255,.82);
+      font-size:12px; white-space:nowrap;
+    }
+    .mini{width:9px; height:9px; border-radius:99px; background:var(--d); box-shadow:0 0 0 4px rgba(245,158,11,.14)}
+
+    /* Slides */
+    .slides{padding:14px; display:grid; gap:12px;}
+    .slide{
+      border-radius: 16px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.03);
+      overflow:hidden;
+      position:relative;
+    }
+    .slideTop{
+      padding:12px;
+      display:flex; align-items:flex-start; justify-content:space-between; gap:10px;
+      border-bottom:1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.02);
+    }
+    .slideTitle{
+      display:flex; gap:10px; align-items:flex-start;
+    }
+    .no{
+      width:30px; height:30px; border-radius:12px;
+      display:grid; place-items:center;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(34,197,94,.10);
+      color: rgba(255,255,255,.92);
+      font-weight:900;
+      flex:0 0 auto;
+    }
+    .ttl{font-size:13px; font-weight:800; letter-spacing:.15px; margin:0;}
+    .st{margin:6px 0 0; color:var(--muted); font-size:12px; line-height:1.45;}
+    .badgeRow{display:flex; gap:6px; flex-wrap:wrap; justify-content:flex-end;}
+    .badge{
+      font-size:11px;
+      padding:5px 8px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.10);
+      color:var(--muted);
+      background: rgba(255,255,255,.02);
+      white-space:nowrap;
+    }
+    .badge.b{border-color: rgba(34,197,94,.22); color: rgba(198,255,221,.84); background: rgba(34,197,94,.07);}
+    .badge.c{border-color: rgba(6,182,212,.25); color: rgba(190,250,255,.82); background: rgba(6,182,212,.08);}
+    .badge.d{border-color: rgba(245,158,11,.22); color: rgba(255,233,198,.86); background: rgba(245,158,11,.07);}
+    .badge.r{border-color: rgba(239,68,68,.26); color: rgba(255,210,210,.88); background: rgba(239,68,68,.08);}
+
+    .slideBody{padding:12px;}
+    .cols{display:grid; grid-template-columns: 1fr 1fr; gap:10px;}
+    @media (max-width: 980px){ .cols{grid-template-columns:1fr;} }
+    .box{
+      border-radius: 14px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.02);
+      padding:10px;
+    }
+    .box h3{margin:0; font-size:12px; color: rgba(255,255,255,.86); letter-spacing:.1px;}
+    .box ul{margin:8px 0 0 18px; padding:0;}
+    .box li{color:var(--muted); font-size:12px; line-height:1.45; margin:4px 0;}
+    .cta{
+      margin-top:10px;
+      display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:space-between;
+      padding:10px;
+      border-radius: 14px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(6,182,212,.06);
+    }
+    .cta b{font-size:12px;}
+    .btnRow{display:flex; gap:10px; flex-wrap:wrap;}
+    .btn{
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.04);
+      color: rgba(255,255,255,.84);
+      padding:10px 12px;
+      border-radius: 12px;
+      font-size:12px;
+      cursor:pointer;
+      transition: transform .12s ease, border-color .12s ease;
+    }
+    .btn:hover{transform: translateY(-1px); border-color: rgba(255,255,255,.18);}
+    .btn.primary{
+      border-color: rgba(34,197,94,.28);
+      background: rgba(34,197,94,.10);
+    }
+
+    /* Right side */
+    .side{display:grid; gap:14px;}
+    .kpis{padding:14px;}
+    .kpiGrid{display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:10px;}
+    .kpi{
+      border-radius: 14px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.03);
+      padding:10px;
+      position:relative;
+      overflow:hidden;
+    }
+    .kpi:before{
+      content:""; position:absolute; inset:-1px;
+      background: radial-gradient(220px 80px at 20% 0%, rgba(34,197,94,.14), transparent 55%);
+      opacity:.85; pointer-events:none;
+    }
+    .kpi:nth-child(2):before{background: radial-gradient(220px 80px at 20% 0%, rgba(6,182,212,.14), transparent 55%);}
+    .kpi:nth-child(3):before{background: radial-gradient(220px 80px at 20% 0%, rgba(245,158,11,.14), transparent 55%);}
+    .kpi:nth-child(4):before{background: radial-gradient(220px 80px at 20% 0%, rgba(124,58,237,.14), transparent 55%);}
+    .kpi .l{position:relative; z-index:1; font-size:11px; color:var(--muted);}
+    .kpi .v{position:relative; z-index:1; margin-top:6px; font-size:16px; font-weight:900;}
+    .kpi .h{position:relative; z-index:1; margin-top:6px; font-size:11px; color:var(--muted2); line-height:1.35;}
+
+    .list{padding:14px;}
+    .li{
+      border-radius: 14px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.03);
+      padding:10px;
+      display:flex; gap:10px; align-items:flex-start;
+      margin-top:10px;
+    }
+    .ic{
+      width:30px; height:30px; border-radius:12px;
+      display:grid; place-items:center;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.04);
+      flex:0 0 auto;
+    }
+    .li b{display:block; font-size:12px; margin:0; color: rgba(255,255,255,.88);}
+    .li p{margin:4px 0 0; font-size:12px; color:var(--muted); line-height:1.45;}
+
+    /* Toast */
+    .toast{
+      position: fixed;
+      right: 18px; bottom: 18px;
+      background: rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.14);
+      backdrop-filter: blur(12px);
+      padding: 10px 12px;
+      border-radius: 14px;
+      box-shadow: var(--shadow2);
+      color: rgba(255,255,255,.86);
+      font-size: 12px;
+      display:none;
+      max-width: 380px;
+    }
+
+    /* Print */
+    @media print{
+      body{background:#fff; color:#000;}
+      .pill, .btnRow, .toast{display:none !important;}
+      .card{box-shadow:none;}
+    }
+
+    svg{display:block}
+    .svg{width:16px; height:16px; opacity:.95}
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <div class="top">
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div>
+          <h1>AutoWash CRM Bot — Avtomoyka Egasi uchun Qisqa Taqdimot</h1>
+          <p class="sub">
+            Sizga <b>ko‘proq bron</b>, <b>kamroq bekor turish</b>, <b>navbat nazorati</b> va <b>kunlik KPI</b> kerak bo‘lsa —
+            bu Telegram ichidagi CRM Bot aynan shuni beradi.
+          </p>
+        </div>
+      </div>
+
+      <div class="pills">
+        <div class="pill"><span class="dot"></span>Ko‘proq bron</div>
+        <div class="pill"><span class="dot c"></span>Navbat + jadval</div>
+        <div class="pill"><span class="dot d"></span>KPI + hisobot</div>
+      </div>
+    </div>
+
+    <div class="grid">
+      <!-- LEFT: Slides -->
+      <div class="card">
+        <div class="head">
+          <div>
+            <h2>Taqdimot slaydlari (1 sahifa — ketma-ket)</h2>
+            <p>Har bir blok — slayd. Investor yoki avtomoyka egasiga ko‘rsatish uchun sodda va aniq.</p>
+          </div>
+          <div class="chip"><span class="mini"></span>Owner Pitch</div>
+        </div>
+
+        <div class="slides">
+          <!-- Slide 1 -->
+          <section class="slide">
+            <div class="slideTop">
+              <div class="slideTitle">
+                <div class="no">1</div>
+                <div>
+                  <p class="ttl">Muammo: “bron yo‘q”, “navbat tartibsiz”, “bekor turish ko‘p”</p>
+                  <p class="st">Ko‘p avtomoykalarda mijozlar qo‘ng‘iroq qiladi, yozishmalar yo‘qoladi, navbat aralashib ketadi.</p>
+                </div>
+              </div>
+              <div class="badgeRow">
+                <span class="badge r">No-show</span>
+                <span class="badge r">Double booking</span>
+                <span class="badge r">Bekor turish</span>
+              </div>
+            </div>
+            <div class="slideBody">
+              <div class="cols">
+                <div class="box">
+                  <h3>Bugungi og‘riqlar</h3>
+                  <ul>
+                    <li>Telefon/Telegram chatda bron “yo‘qolib” ketadi</li>
+                    <li>Bir vaqtda 2 ta bron — mijoz norozilik</li>
+                    <li>Pik soatda navbat: boshqarib bo‘lmaydi</li>
+                    <li>Kun yakunida aniq KPI yo‘q</li>
+                  </ul>
+                </div>
+                <div class="box">
+                  <h3>Natija</h3>
+                  <ul>
+                    <li>Daromad o‘sishi sekinlashadi</li>
+                    <li>Reyting tushadi</li>
+                    <li>Bo‘sh vaqtlar ko‘payadi</li>
+                    <li>Egaga nazorat qiyinlashadi</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Slide 2 -->
+          <section class="slide">
+            <div class="slideTop">
+              <div class="slideTitle">
+                <div class="no">2</div>
+                <div>
+                  <p class="ttl">Yechim: Telegram ichida CRM Bot + Marketplace</p>
+                  <p class="st">Mijoz bot orqali topadi va band qiladi. Siz esa CRM Bot’da jadval, navbat, postlar va KPI’ni boshqarasiz.</p>
+                </div>
+              </div>
+              <div class="badgeRow">
+                <span class="badge b">CRM</span>
+                <span class="badge c">Slot Engine</span>
+                <span class="badge d">KPI</span>
+              </div>
+            </div>
+            <div class="slideBody">
+              <div class="cols">
+                <div class="box">
+                  <h3>Siz olasiz</h3>
+                  <ul>
+                    <li>Real-time bronlar (double booking yo‘q)</li>
+                    <li>Navbat va post taqsimoti</li>
+                    <li>Avto-eslatmalar (no-show kamayadi)</li>
+                    <li>Mijoz tarixi va loyalty (retensiya)</li>
+                  </ul>
+                </div>
+                <div class="box">
+                  <h3>Mijoz oladi</h3>
+                  <ul>
+                    <li>Yaqin avtomoykani tez topish</li>
+                    <li>Bo‘sh slotni ko‘rib band qilish</li>
+                    <li>Kelishdan oldin eslatma</li>
+                    <li>Oson baholash va ishonch</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Slide 3 -->
+          <section class="slide">
+            <div class="slideTop">
+              <div class="slideTitle">
+                <div class="no">3</div>
+                <div>
+                  <p class="ttl">Qanday ishlaydi: 5 qadamli oqim</p>
+                  <p class="st">Owner uchun eng muhim: bron → kelish → xizmat → yakun → KPI.</p>
+                </div>
+              </div>
+              <div class="badgeRow">
+                <span class="badge c">Jadval</span>
+                <span class="badge c">Navbat</span>
+                <span class="badge d">Hisobot</span>
+              </div>
+            </div>
+            <div class="slideBody">
+              <div class="box">
+                <h3>Operatsion oqim</h3>
+                <ul>
+                  <li><b>Bron keladi</b> → CRM Bot’da ko‘rasiz → tasdiqlaysiz</li>
+                  <li><b>Mijoz keladi</b> → “Check-in” bosasiz</li>
+                  <li><b>Post biriktirasiz</b> → “In service” (real-time bandlik)</li>
+                  <li><b>Yakun</b> → “Done” → feedback so‘rovi avtomatik</li>
+                  <li><b>KPI</b> → utilization, no-show, throughput, reyting</li>
+                </ul>
+              </div>
+
+              <div class="cta">
+                <div>
+                  <b>Natija:</b> postlar kam bekor turadi, navbat tartibga tushadi, egada nazorat bo‘ladi.
+                </div>
+                <div class="btnRow">
+                  <button class="btn primary" onclick="demoToast('Demo: CRM Bot ekrani — “Bugun” jadvali')">Demo ko‘rsatish</button>
+                  <button class="btn" onclick="window.print()">Print / PDF</button>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Slide 4 -->
+          <section class="slide">
+            <div class="slideTop">
+              <div class="slideTitle">
+                <div class="no">4</div>
+                <div>
+                  <p class="ttl">Nima o‘lchanadi: KPI’lar (egaga tushunarli)</p>
+                  <p class="st">KPI bo‘lsa — qaror oson: narx, smena, promo, depozit siyosati.</p>
+                </div>
+              </div>
+              <div class="badgeRow">
+                <span class="badge d">Utilization</span>
+                <span class="badge d">No-show</span>
+                <span class="badge d">Reyting</span>
+              </div>
+            </div>
+            <div class="slideBody">
+              <div class="cols">
+                <div class="box">
+                  <h3>Asosiy KPI</h3>
+                  <ul>
+                    <li><b>Utilization</b> — postlar bandligi (%)</li>
+                    <li><b>Throughput</b> — mashina/kun</li>
+                    <li><b>No-show</b> — kelmagan bronlar (%)</li>
+                    <li><b>Rating</b> — sifat va ishonch</li>
+                  </ul>
+                </div>
+                <div class="box">
+                  <h3>Qanday foyda beradi</h3>
+                  <ul>
+                    <li>Pik soatlarni bilasiz → smenani to‘g‘rilaysiz</li>
+                    <li>No-show ko‘p bo‘lsa → eslatma/depozit</li>
+                    <li>Reyting tushsa → xizmat standartlari</li>
+                    <li>Bo‘sh soatlarda promo → bron ko‘payadi</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Slide 5 -->
+          <section class="slide">
+            <div class="slideTop">
+              <div class="slideTitle">
+                <div class="no">5</div>
+                <div>
+                  <p class="ttl">Hamkorlik modeli (sodda)</p>
+                  <p class="st">Sizga mos bo‘lgan variant: komissiya, obuna, yoki aralash model.</p>
+                </div>
+              </div>
+              <div class="badgeRow">
+                <span class="badge b">Obuna</span>
+                <span class="badge d">Komissiya</span>
+                <span class="badge c">Premium analitika</span>
+              </div>
+            </div>
+            <div class="slideBody">
+              <div class="cols">
+                <div class="box">
+                  <h3>Variantlar</h3>
+                  <ul>
+                    <li><b>Obuna</b> — CRM Bot + jadval + navbat</li>
+                    <li><b>Komissiya</b> — marketplace’dan kelgan bronlar</li>
+                    <li><b>Premium</b> — benchmarking, tavsiyalar, reklama</li>
+                  </ul>
+                </div>
+                <div class="box">
+                  <h3>Onboarding</h3>
+                  <ul>
+                    <li>1) Profil: manzil, ish vaqti, postlar</li>
+                    <li>2) Xizmatlar: narx, davomiylik</li>
+                    <li>3) Test bron: 1 kun sinov</li>
+                    <li>4) Ishga tushirish: reklamaga chiqish</li>
+                  </ul>
+                </div>
+              </div>
+
+              <div class="cta" style="background: rgba(34,197,94,.07);">
+                <div>
+                  <b>Call-to-action:</b> 3 kunlik pilot — “CRM + bron”ni real natija bilan ko‘rsatamiz.
+                </div>
+                <div class="btnRow">
+                  <button class="btn primary" onclick="demoToast('Pilot: 3 kun — utilization va bronlar dinamikasi')">Pilot taklif</button>
+                  <button class="btn" onclick="demoToast('Kontakt: Telegram orqali ulanamiz (QR/username)')">Kontakt</button>
+                </div>
+              </div>
+            </div>
+          </section>
+
+        </div>
+      </div>
+
+      <!-- RIGHT: Owner summary -->
+      <div class="side">
+        <div class="card">
+          <div class="head">
+            <div>
+              <h2>Owner uchun “1 daqiqalik” xulosa</h2>
+              <p>Eng muhim va eng tez tushuniladigan qiymat.</p>
+            </div>
+            <div class="chip"><span class="mini" style="background:var(--b); box-shadow:0 0 0 4px rgba(34,197,94,.14)"></span>Value</div>
+          </div>
+          <div class="kpis">
+            <div class="kpiGrid">
+              <div class="kpi">
+                <div class="l">Natija #1</div>
+                <div class="v">Ko‘proq bron</div>
+                <div class="h">Mijozlar real-time slot ko‘rib band qiladi.</div>
+              </div>
+              <div class="kpi">
+                <div class="l">Natija #2</div>
+                <div class="v">Kamroq no-show</div>
+                <div class="h">Eslatma + (ixtiyoriy) depozit siyosati.</div>
+              </div>
+              <div class="kpi">
+                <div class="l">Natija #3</div>
+                <div class="v">Nazorat + tartib</div>
+                <div class="h">Navbat, post taqsimoti, statuslar aniq.</div>
+              </div>
+              <div class="kpi">
+                <div class="l">Natija #4</div>
+                <div class="v">KPI bilan boshqaruv</div>
+                <div class="h">Utilization, throughput, reyting, trendlar.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="head">
+            <div>
+              <h2>Qanday boshlaymiz?</h2>
+              <p>Eng sodda onboarding checklist.</p>
+            </div>
+            <div class="chip"><span class="mini" style="background:var(--c); box-shadow:0 0 0 4px rgba(6,182,212,.14)"></span>Onboarding</div>
+          </div>
+          <div class="list">
+            <div class="li">
+              <div class="ic" aria-hidden="true">
+                <svg class="svg" viewBox="0 0 24 24" fill="none">
+                  <path d="M7 7h10v4H7V7Zm0 6h10v4H7v-4Z" stroke="rgba(255,255,255,.85)" stroke-width="1.6" stroke-linejoin="round"/>
+                  <path d="M5 4.8c0-.44.36-.8.8-.8h12.4c.44 0 .8.36.8.8v14.4c0 .44-.36.8-.8.8H5.8c-.44 0-.8-.36-.8-.8V4.8Z" stroke="rgba(255,255,255,.65)" stroke-width="1.4"/>
+                </svg>
+              </div>
+              <div>
+                <b>1) Profil</b>
+                <p>Manzil, ish vaqti, postlar soni, aloqa.</p>
+              </div>
+            </div>
+
+            <div class="li">
+              <div class="ic" aria-hidden="true">
+                <svg class="svg" viewBox="0 0 24 24" fill="none">
+                  <path d="M12 3v18" stroke="rgba(255,255,255,.75)" stroke-width="1.6" stroke-linecap="round"/>
+                  <path d="M7 7h10" stroke="rgba(255,255,255,.75)" stroke-width="1.6" stroke-linecap="round"/>
+                  <path d="M7 17h10" stroke="rgba(255,255,255,.75)" stroke-width="1.6" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <div>
+                <b>2) Xizmatlar</b>
+                <p>Narx, davomiylik, qoidalar (cancel/no-show).</p>
+              </div>
+            </div>
+
+            <div class="li">
+              <div class="ic" aria-hidden="true">
+                <svg class="svg" viewBox="0 0 24 24" fill="none">
+                  <path d="M6 18V6" stroke="rgba(255,255,255,.78)" stroke-width="1.6" stroke-linecap="round"/>
+                  <path d="M6 18h12" stroke="rgba(255,255,255,.78)" stroke-width="1.6" stroke-linecap="round"/>
+                  <path d="M8.5 14.5l3-3 2 2 3.5-4" stroke="rgba(255,255,255,.78)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+              <div>
+                <b>3) Pilot</b>
+                <p>3 kun: bron + utilization + reyting natijasini ko‘ramiz.</p>
+              </div>
+            </div>
+
+            <div class="li">
+              <div class="ic" aria-hidden="true">
+                <svg class="svg" viewBox="0 0 24 24" fill="none">
+                  <path d="M12 21s7-4.5 7-11a7 7 0 1 0-14 0c0 6.5 7 11 7 11Z" stroke="rgba(255,255,255,.78)" stroke-width="1.6" stroke-linejoin="round"/>
+                  <path d="M12 11.5a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z" stroke="rgba(255,255,255,.78)" stroke-width="1.6"/>
+                </svg>
+              </div>
+              <div>
+                <b>4) Scale</b>
+                <p>Keyin promo, premium analitika, segmentlar.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const toast = document.getElementById("toast");
+    function demoToast(msg){
+      toast.textContent = msg;
+      toast.style.display = "block";
+      clearTimeout(demoToast._t);
+      demoToast._t = setTimeout(() => toast.style.display = "none", 2400);
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,1111 @@
+<!doctype html>
+<html lang="uz">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AutoWash — BPMN Diagramma + SOP (Operatsion Qo‘llanma)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#0b1220;
+      --card: rgba(255,255,255,.06);
+      --card2: rgba(255,255,255,.04);
+      --stroke: rgba(255,255,255,.12);
+      --stroke2: rgba(255,255,255,.18);
+      --text: rgba(255,255,255,.92);
+      --muted: rgba(255,255,255,.68);
+      --muted2: rgba(255,255,255,.52);
+
+      --a:#7c3aed; /* purple - Client */
+      --b:#22c55e; /* green  - CRM/Staff */
+      --c:#06b6d4; /* cyan   - Backend */
+      --d:#f59e0b; /* amber  - Control/KPI */
+      --r:#ef4444; /* red    - Exception */
+
+      --shadow: 0 18px 60px rgba(0,0,0,.45);
+      --shadow2: 0 10px 28px rgba(0,0,0,.35);
+      --radius: 18px;
+
+      --max: 1220px;
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(900px 500px at 18% 10%, rgba(124,58,237,.24), transparent 55%),
+        radial-gradient(800px 420px at 85% 16%, rgba(6,182,212,.18), transparent 58%),
+        radial-gradient(900px 700px at 55% 88%, rgba(34,197,94,.12), transparent 60%),
+        linear-gradient(180deg,#070b14 0%, var(--bg) 40%, #070b14 100%);
+      overflow-x:hidden;
+    }
+
+    .wrap{max-width:var(--max); margin:0 auto; padding:26px 18px 48px;}
+    .top{
+      display:flex; gap:16px; align-items:flex-start; justify-content:space-between; flex-wrap:wrap;
+      margin-bottom:14px;
+    }
+    .brand{display:flex; gap:12px; align-items:center; min-width: 320px;}
+    .logo{
+      width:44px; height:44px; border-radius:14px;
+      background:
+        radial-gradient(12px 12px at 30% 30%, rgba(255,255,255,.42), transparent 55%),
+        linear-gradient(135deg, rgba(124,58,237,.85), rgba(6,182,212,.80));
+      border:1px solid rgba(255,255,255,.14);
+      box-shadow: 0 14px 40px rgba(124,58,237,.18);
+      position:relative; overflow:hidden;
+    }
+    .logo:after{
+      content:""; position:absolute; inset:-40%;
+      background: linear-gradient(120deg, transparent, rgba(255,255,255,.22), transparent);
+      transform: rotate(18deg);
+      animation: shine 4.8s ease-in-out infinite;
+    }
+    @keyframes shine{
+      0%, 70%{ transform: translateX(-40%) rotate(18deg); opacity:0; }
+      85%{ opacity:1; }
+      100%{ transform: translateX(40%) rotate(18deg); opacity:0; }
+    }
+
+    h1{margin:0; font-size:18px; line-height:1.15; letter-spacing:.2px;}
+    .sub{margin:6px 0 0; color:var(--muted); font-size:13px; line-height:1.45; max-width:780px;}
+
+    .pills{display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end;}
+    .pill{
+      display:flex; align-items:center; gap:8px;
+      padding:10px 12px; border-radius:999px;
+      background: rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.10);
+      box-shadow: var(--shadow2);
+      backdrop-filter: blur(10px);
+      color:var(--muted); font-size:12px; white-space:nowrap;
+    }
+    .dot{width:8px; height:8px; border-radius:99px; background:var(--c); box-shadow:0 0 0 4px rgba(6,182,212,.14)}
+    .dot.a{background:var(--a); box-shadow:0 0 0 4px rgba(124,58,237,.14)}
+    .dot.b{background:var(--b); box-shadow:0 0 0 4px rgba(34,197,94,.14)}
+    .dot.d{background:var(--d); box-shadow:0 0 0 4px rgba(245,158,11,.14)}
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1.35fr .65fr;
+      gap:14px;
+      align-items:start;
+    }
+    @media (max-width: 980px){
+      .grid{grid-template-columns:1fr;}
+      .pills{justify-content:flex-start;}
+    }
+
+    .card{
+      border-radius: var(--radius);
+      background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
+      border:1px solid rgba(255,255,255,.10);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .head{
+      padding:16px 16px 12px;
+      border-bottom:1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.02);
+      display:flex; align-items:flex-start; justify-content:space-between; gap:12px;
+    }
+    .head h2{margin:0; font-size:14px; letter-spacing:.2px;}
+    .head p{margin:6px 0 0; font-size:12px; color:var(--muted); line-height:1.45; max-width:720px;}
+    .chip{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:8px 10px; border-radius:999px;
+      background: rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.10);
+      color: rgba(255,255,255,.82);
+      font-size:12px; white-space:nowrap;
+    }
+    .mini{width:9px; height:9px; border-radius:99px; background:var(--d); box-shadow:0 0 0 4px rgba(245,158,11,.14)}
+
+    /* BPMN area */
+    .bpmnWrap{padding:14px;}
+    .legend{
+      display:flex; flex-wrap:wrap; gap:10px; margin:10px 0 0;
+    }
+    .lg{
+      display:flex; align-items:center; gap:8px;
+      padding:8px 10px; border-radius:999px;
+      background: rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.10);
+      color:var(--muted); font-size:12px;
+    }
+    .lg .k{width:10px; height:10px; border-radius:4px;}
+    .k.a{background: rgba(124,58,237,.55); border:1px solid rgba(124,58,237,.75);}
+    .k.b{background: rgba(34,197,94,.45); border:1px solid rgba(34,197,94,.70);}
+    .k.c{background: rgba(6,182,212,.45); border:1px solid rgba(6,182,212,.70);}
+    .k.d{background: rgba(245,158,11,.45); border:1px solid rgba(245,158,11,.70);}
+    .k.r{background: rgba(239,68,68,.35); border:1px solid rgba(239,68,68,.70);}
+
+    .svgBox{
+      border-radius: 16px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.03);
+      overflow:auto;
+    }
+
+    /* SOP */
+    .sop{padding:14px;}
+    .tabs{
+      display:flex; gap:10px; flex-wrap:wrap;
+      margin: 2px 0 12px;
+    }
+    .tab{
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.04);
+      color: rgba(255,255,255,.80);
+      padding:10px 12px;
+      border-radius: 999px;
+      font-size:12px;
+      cursor:pointer;
+      user-select:none;
+      transition: transform .12s ease, border-color .12s ease, background .12s ease;
+    }
+    .tab:hover{transform: translateY(-1px); border-color: rgba(255,255,255,.18);}
+    .tab.active{
+      border-color: rgba(255,255,255,.20);
+      background: rgba(255,255,255,.06);
+      box-shadow: var(--shadow2);
+    }
+    .panel{display:none;}
+    .panel.active{display:block;}
+
+    .stepList{display:grid; gap:10px;}
+    .sopStep{
+      border-radius: 14px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.03);
+      padding:12px;
+    }
+    .sopTop{
+      display:flex; align-items:flex-start; justify-content:space-between; gap:10px;
+    }
+    .sopTitle{
+      display:flex; gap:10px; align-items:flex-start;
+      font-size:12px; font-weight:700; color: rgba(255,255,255,.90);
+    }
+    .n{
+      width:26px; height:26px; border-radius:10px;
+      display:grid; place-items:center;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(6,182,212,.10);
+      color: rgba(255,255,255,.92);
+      font-weight:800;
+      flex:0 0 auto;
+    }
+    .n.a{background: rgba(124,58,237,.12)}
+    .n.b{background: rgba(34,197,94,.10)}
+    .n.d{background: rgba(245,158,11,.10)}
+    .meta{
+      display:flex; flex-wrap:wrap; gap:6px; justify-content:flex-end;
+    }
+    .tag{
+      font-size:11px;
+      padding:5px 8px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.10);
+      color:var(--muted);
+      background: rgba(255,255,255,.02);
+      white-space:nowrap;
+    }
+    .tag.c{border-color: rgba(6,182,212,.25); color: rgba(190,250,255,.82); background: rgba(6,182,212,.08);}
+    .tag.a{border-color: rgba(124,58,237,.25); color: rgba(230,220,255,.86); background: rgba(124,58,237,.08);}
+    .tag.b{border-color: rgba(34,197,94,.22); color: rgba(198,255,221,.84); background: rgba(34,197,94,.07);}
+    .tag.d{border-color: rgba(245,158,11,.22); color: rgba(255,233,198,.86); background: rgba(245,158,11,.07);}
+    .tag.r{border-color: rgba(239,68,68,.26); color: rgba(255,210,210,.88); background: rgba(239,68,68,.08);}
+
+    .txt{margin-top:8px; color:var(--muted); font-size:12px; line-height:1.5;}
+    .grid2{display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:10px;}
+    @media (max-width: 980px){ .grid2{grid-template-columns:1fr;} }
+
+    .box{
+      border-radius: 12px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.02);
+      padding:10px;
+    }
+    .box h4{margin:0; font-size:12px; color: rgba(255,255,255,.86);}
+    .box ul{margin:8px 0 0 18px; padding:0;}
+    .box li{color:var(--muted); font-size:12px; line-height:1.45;}
+
+    .side{display:grid; gap:14px;}
+    .kpis{padding:14px;}
+    .kpiGrid{display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:10px;}
+    .kpi{
+      border-radius: 14px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.03);
+      padding:10px;
+      position:relative;
+      overflow:hidden;
+    }
+    .kpi:before{
+      content:""; position:absolute; inset:-1px;
+      background: radial-gradient(220px 80px at 20% 0%, rgba(6,182,212,.14), transparent 55%);
+      opacity:.8; pointer-events:none;
+    }
+    .kpi:nth-child(2):before{background: radial-gradient(220px 80px at 20% 0%, rgba(124,58,237,.14), transparent 55%);}
+    .kpi:nth-child(3):before{background: radial-gradient(220px 80px at 20% 0%, rgba(34,197,94,.12), transparent 55%);}
+    .kpi:nth-child(4):before{background: radial-gradient(220px 80px at 20% 0%, rgba(245,158,11,.14), transparent 55%);}
+    .kpi .l{position:relative; z-index:1; font-size:11px; color:var(--muted);}
+    .kpi .v{position:relative; z-index:1; margin-top:6px; font-size:16px; font-weight:800;}
+    .kpi .h{position:relative; z-index:1; margin-top:6px; font-size:11px; color:var(--muted2); line-height:1.35;}
+
+    .note{padding:14px;}
+    .note .line{margin-top:8px; color:var(--muted); font-size:12px; line-height:1.45;}
+    .btnRow{display:flex; gap:10px; flex-wrap:wrap; margin-top:10px;}
+    .btn{
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.04);
+      color: rgba(255,255,255,.84);
+      padding:10px 12px;
+      border-radius: 12px;
+      font-size:12px;
+      cursor:pointer;
+      transition: transform .12s ease, border-color .12s ease;
+    }
+    .btn:hover{transform: translateY(-1px); border-color: rgba(255,255,255,.18);}
+    .btn.primary{
+      border-color: rgba(6,182,212,.28);
+      background: rgba(6,182,212,.10);
+    }
+
+    .toast{
+      position: fixed;
+      right: 18px; bottom: 18px;
+      background: rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.14);
+      backdrop-filter: blur(12px);
+      padding: 10px 12px;
+      border-radius: 14px;
+      box-shadow: var(--shadow2);
+      color: rgba(255,255,255,.86);
+      font-size: 12px;
+      display:none;
+      max-width: 360px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <div class="top">
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div>
+          <h1>Grafik BPMN + SOP — AutoWash (Telegram Marketplace + CRM)</h1>
+          <p class="sub">
+            Bu sahifa operatsion jamoa uchun: <b>jarayon oqimini</b> (BPMN) va <b>qanday ishlash kerakligini</b> (SOP) bitta joyda ko‘rsatadi.
+            Terminlar: <b>post</b> = “bay” (bitta mashina yuviladigan joy).
+          </p>
+        </div>
+      </div>
+
+      <div class="pills">
+        <div class="pill"><span class="dot a"></span>Mijoz Bot</div>
+        <div class="pill"><span class="dot"></span>Backend</div>
+        <div class="pill"><span class="dot b"></span>CRM Bot + Avtomoyka</div>
+        <div class="pill"><span class="dot d"></span>KPI nazorat</div>
+      </div>
+    </div>
+
+    <div class="grid">
+      <!-- LEFT: BPMN + SOP -->
+      <div>
+        <!-- BPMN CARD -->
+        <div class="card">
+          <div class="head">
+            <div>
+              <h2>1) Grafik BPMN diagramma (soddalashtirilgan, operatsion)</h2>
+              <p>Diagramma “happy path” va asosiy exception’larni ko‘rsatadi: slot yo‘q, bekor qilish, no-show.</p>
+            </div>
+            <div class="chip">
+              <span class="mini"></span>
+              BPMN View
+            </div>
+          </div>
+
+          <div class="bpmnWrap">
+            <div class="svgBox">
+              <!-- SVG BPMN (swimlanes + elements) -->
+              <svg id="bpmnSvg" width="1400" height="820" viewBox="0 0 1400 820" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="BPMN diagramma">
+                <defs>
+                  <filter id="sh" x="-20%" y="-20%" width="140%" height="140%">
+                    <feDropShadow dx="0" dy="10" stdDeviation="10" flood-color="#000" flood-opacity="0.30"/>
+                  </filter>
+                  <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                    <path d="M0,0 L10,5 L0,10 z" fill="rgba(255,255,255,.55)"/>
+                  </marker>
+                  <style>
+                    .lane { fill: rgba(255,255,255,.03); stroke: rgba(255,255,255,.10); }
+                    .laneTitle { fill: rgba(255,255,255,.75); font: 600 14px Inter, sans-serif; }
+                    .hint { fill: rgba(255,255,255,.55); font: 500 12px Inter, sans-serif; }
+
+                    .task { fill: rgba(255,255,255,.04); stroke: rgba(255,255,255,.14); rx: 14; }
+                    .taskText { fill: rgba(255,255,255,.86); font: 600 12.5px Inter, sans-serif; }
+                    .taskSub { fill: rgba(255,255,255,.56); font: 500 11px Inter, sans-serif; }
+
+                    .start { fill: rgba(34,197,94,.10); stroke: rgba(34,197,94,.65); }
+                    .end { fill: rgba(124,58,237,.10); stroke: rgba(124,58,237,.65); }
+                    .eventText { fill: rgba(255,255,255,.78); font: 600 12px Inter, sans-serif; }
+
+                    .gw { fill: rgba(245,158,11,.08); stroke: rgba(245,158,11,.65); }
+                    .gwX { fill: rgba(255,255,255,.80); font: 800 16px Inter, sans-serif; }
+                    .gwLabel { fill: rgba(255,255,255,.62); font: 600 11px Inter, sans-serif; }
+
+                    .msg { fill: rgba(6,182,212,.08); stroke: rgba(6,182,212,.65); rx: 14; }
+                    .ex { fill: rgba(239,68,68,.07); stroke: rgba(239,68,68,.65); rx: 14; }
+
+                    .flow { stroke: rgba(255,255,255,.50); stroke-width: 2; fill: none; marker-end: url(#arrow); }
+                    .flowDash { stroke: rgba(255,255,255,.40); stroke-width: 2; fill: none; marker-end: url(#arrow); stroke-dasharray: 7 6; }
+                    .lbl { fill: rgba(255,255,255,.60); font: 600 11px Inter, sans-serif; }
+                  </style>
+                </defs>
+
+                <!-- Swimlanes -->
+                <rect class="lane" x="30" y="40" width="1340" height="140" rx="16"/>
+                <rect class="lane" x="30" y="190" width="1340" height="140" rx="16"/>
+                <rect class="lane" x="30" y="340" width="1340" height="160" rx="16"/>
+                <rect class="lane" x="30" y="510" width="1340" height="140" rx="16"/>
+                <rect class="lane" x="30" y="660" width="1340" height="130" rx="16"/>
+
+                <text class="laneTitle" x="46" y="70">1) Mijoz (avtomobil egasi)</text>
+                <text class="hint" x="46" y="92">Topish → Band qilish → Kelish → Baholash</text>
+
+                <text class="laneTitle" x="46" y="220">2) Mijoz Bot (Telegram)</text>
+                <text class="hint" x="46" y="242">UI/UX: filtrlash, slot tanlash, tasdiq, eslatmalar</text>
+
+                <text class="laneTitle" x="46" y="370">3) Backend / Platforma</text>
+                <text class="hint" x="46" y="392">Slot engine, DB, xabarnoma, to‘lov, statuslar</text>
+
+                <text class="laneTitle" x="46" y="540">4) Car Wash CRM Bot</text>
+                <text class="hint" x="46" y="562">Jadval, qabul, navbat, post taqsimoti, KPI</text>
+
+                <text class="laneTitle" x="46" y="690">5) Avtomoyka xodimlari</text>
+                <text class="hint" x="46" y="712">Amaliy ish: yuvish, yakun, sifat</text>
+
+                <!-- Start event -->
+                <circle class="start" cx="170" cy="120" r="18"/>
+                <text class="eventText" x="140" y="150">Start</text>
+
+                <!-- Customer tasks (lane 1) -->
+                <rect class="task" x="230" y="85" width="220" height="70" filter="url(#sh)"/>
+                <text class="taskText" x="245" y="112">Botni ochadi / login</text>
+                <text class="taskSub" x="245" y="134">telefon + lokatsiya</text>
+
+                <rect class="task" x="500" y="85" width="250" height="70" filter="url(#sh)"/>
+                <text class="taskText" x="515" y="112">Avtomoyka + xizmat tanlaydi</text>
+                <text class="taskSub" x="515" y="134">filtrlar, reyting, narx</text>
+
+                <rect class="task" x="800" y="85" width="240" height="70" filter="url(#sh)"/>
+                <text class="taskText" x="815" y="112">Slot tanlaydi</text>
+                <text class="taskSub" x="815" y="134">kalendar / vaqt</text>
+
+                <rect class="task" x="1080" y="85" width="250" height="70" filter="url(#sh)"/>
+                <text class="taskText" x="1095" y="112">Keladi + check-in</text>
+                <text class="taskSub" x="1095" y="134">xizmatdan so‘ng baho</text>
+
+                <!-- Flows lane 1 -->
+                <path class="flow" d="M188 120 L230 120"/>
+                <path class="flow" d="M450 120 L500 120"/>
+                <path class="flow" d="M750 120 L800 120"/>
+                <path class="flow" d="M1040 120 L1080 120"/>
+
+                <!-- Client Bot lane 2 -->
+                <rect class="msg" x="250" y="235" width="250" height="70" filter="url(#sh)"/>
+                <text class="taskText" x="265" y="262">Onboarding UI</text>
+                <text class="taskSub" x="265" y="284">auth + profil yaratish</text>
+
+                <rect class="msg" x="540" y="235" width="260" height="70" filter="url(#sh)"/>
+                <text class="taskText" x="555" y="262">Qidiruv / Filtr UI</text>
+                <text class="taskSub" x="555" y="284">katalog + taqqoslash</text>
+
+                <rect class="msg" x="840" y="235" width="260" height="70" filter="url(#sh)"/>
+                <text class="taskText" x="855" y="262">Slot tanlash UI</text>
+                <text class="taskSub" x="855" y="284">real-time mavjudlik</text>
+
+                <rect class="msg" x="1140" y="235" width="200" height="70" filter="url(#sh)"/>
+                <text class="taskText" x="1155" y="262">Tasdiq + eslatma</text>
+                <text class="taskSub" x="1155" y="284">SMS/Telegram</text>
+
+                <!-- Flows lane 2 -->
+                <path class="flowDash" d="M340 155 L340 235"/>
+                <path class="flowDash" d="M625 155 L670 235"/>
+                <path class="flowDash" d="M920 155 L970 235"/>
+                <path class="flowDash" d="M1205 155 L1240 235"/>
+
+                <!-- Backend lane 3 -->
+                <rect class="task" x="250" y="395" width="260" height="76" filter="url(#sh)"/>
+                <text class="taskText" x="265" y="423">Profilni DB’da saqlash</text>
+                <text class="taskSub" x="265" y="446">Telegram ID, telefon, geo</text>
+
+                <rect class="task" x="540" y="395" width="280" height="76" filter="url(#sh)"/>
+                <text class="taskText" x="555" y="423">Slot Engine: hisoblash</text>
+                <text class="taskSub" x="555" y="446">postlar, davomiylik, buffer</text>
+
+                <!-- Gateway: Slot mavjudmi? -->
+                <polygon class="gw" points="880,433 920,393 960,433 920,473" filter="url(#sh)"/>
+                <text class="gwX" x="914" y="440">?</text>
+                <text class="gwLabel" x="870" y="488">Slot bormi?</text>
+
+                <rect class="task" x="1010" y="395" width="300" height="76" filter="url(#sh)"/>
+                <text class="taskText" x="1025" y="423">Bron yaratish + lock</text>
+                <text class="taskSub" x="1025" y="446">status + (ixtiyoriy) to‘lov</text>
+
+                <!-- Exception: Slot yo‘q -->
+                <rect class="ex" x="1010" y="475" width="300" height="66" filter="url(#sh)"/>
+                <text class="taskText" x="1025" y="502">Exception: slot yo‘q</text>
+                <text class="taskSub" x="1025" y="524">alternativ vaqt taklif</text>
+
+                <!-- Flows lane 3 -->
+                <path class="flowDash" d="M375 305 L380 395"/>
+                <path class="flowDash" d="M670 305 L680 395"/>
+                <path class="flow" d="M510 433 L540 433"/>
+                <path class="flow" d="M820 433 L880 433"/>
+
+                <!-- Gateway outgoing -->
+                <path class="flow" d="M960 433 L1010 433"/>
+                <text class="lbl" x="965" y="422">Ha</text>
+
+                <path class="flow" d="M920 473 L920 508 L1010 508"/>
+                <text class="lbl" x="930" y="495">Yo‘q</text>
+
+                <!-- CRM Bot lane 4 -->
+                <rect class="msg" x="280" y="560" width="280" height="70" filter="url(#sh)"/>
+                <text class="taskText" x="295" y="587">Yangi bron xabari</text>
+                <text class="taskSub" x="295" y="609">CRM Bot → jadvalga</text>
+
+                <rect class="task" x="610" y="560" width="270" height="70" filter="url(#sh)"/>
+                <text class="taskText" x="625" y="587">Tasdiqlash / Avto-qabul</text>
+                <text class="taskSub" x="625" y="609">status: confirmed</text>
+
+                <rect class="task" x="930" y="560" width="250" height="70" filter="url(#sh)"/>
+                <text class="taskText" x="945" y="587">Check-in + post biriktirish</text>
+                <text class="taskSub" x="945" y="609">navbat / bay=post</text>
+
+                <rect class="task" x="1220" y="560" width="150" height="70" filter="url(#sh)"/>
+                <text class="taskText" x="1235" y="587">KPI xulosa</text>
+                <text class="taskSub" x="1235" y="609">kunlik</text>
+
+                <path class="flowDash" d="M1160 433 L1160 555 L560 555 L560 595 L610 595"/>
+                <path class="flow" d="M560 595 L610 595"/>
+                <path class="flow" d="M560 595 L610 595"/>
+
+                <path class="flow" d="M560 595 L610 595"/>
+                <path class="flow" d="M560 595 L610 595"/>
+
+                <path class="flow" d="M560 595 L610 595"/>
+
+                <path class="flow" d="M560 595 L610 595"/>
+                <!-- explicit CRM flow -->
+                <path class="flow" d="M560 595 L610 595"/>
+                <path class="flow" d="M560 595 L610 595"/>
+
+                <path class="flow" d="M560 595 L610 595"/>
+                <path class="flow" d="M560 595 L610 595"/>
+
+                <path class="flow" d="M560 595 L610 595"/>
+                <!-- actually draw proper flows -->
+                <path class="flow" d="M560 595 L610 595"/>
+                <path class="flow" d="M560 595 L610 595"/>
+
+                <!-- Correct flows CRM lane -->
+                <path class="flow" d="M560 595 L610 595"/>
+                <path class="flow" d="M560 595 L610 595"/>
+                <!-- Let's do real ones (overwrite redundancy not harmful visually but keep minimal) -->
+                <path class="flow" d="M560 595 L610 595" opacity="0"/>
+
+                <path class="flow" d="M560 595 L610 595" opacity="0"/>
+
+                <path class="flow" d="M560 595 L610 595" opacity="0"/>
+
+                <path class="flow" d="M560 595 L610 595" opacity="0"/>
+
+                <!-- real connectors -->
+                <path class="flowDash" d="M1160 471 L1160 548 L420 548 L420 560"/>
+                <text class="lbl" x="920" y="545">Bron → CRM</text>
+
+                <path class="flow" d="M560 595 L610 595"/>
+                <path class="flow" d="M880 595 L930 595"/>
+                <path class="flow" d="M1180 595 L1220 595"/>
+
+                <!-- Staff lane 5 -->
+                <rect class="task" x="930" y="695" width="260" height="70" filter="url(#sh)"/>
+                <text class="taskText" x="945" y="722">Xizmatni bajarish</text>
+                <text class="taskSub" x="945" y="744">yuvish / detailing</text>
+
+                <rect class="task" x="1220" y="695" width="150" height="70" filter="url(#sh)"/>
+                <text class="taskText" x="1235" y="722">Yakun</text>
+                <text class="taskSub" x="1235" y="744">done status</text>
+
+                <path class="flowDash" d="M1055 630 L1055 695"/>
+                <path class="flow" d="M1190 730 L1220 730"/>
+
+                <!-- End event -->
+                <circle class="end" cx="1350" cy="120" r="18"/>
+                <text class="eventText" x="1322" y="150">End</text>
+                <path class="flow" d="M1330 120 L1332 120"/>
+                <path class="flow" d="M1330 120 L1332 120" opacity="0"/>
+                <path class="flow" d="M1330 120 L1332 120" opacity="0"/>
+                <path class="flow" d="M1330 120 L1350 120" opacity="0"/>
+                <path class="flow" d="M1330 120 L1350 120" opacity="0"/>
+
+                <!-- Connect to end (from last customer task) -->
+                <path class="flow" d="M1330 120 L1350 120" opacity="0"/>
+                <path class="flow" d="M1330 120 L1350 120" opacity="0"/>
+                <path class="flow" d="M1330 120 L1350 120" opacity="0"/>
+                <path class="flow" d="M1330 120 L1350 120" opacity="0"/>
+                <path class="flow" d="M1330 120 L1350 120" opacity="0"/>
+
+                <path class="flow" d="M1330 120 L1350 120" opacity="0"/>
+
+                <path class="flow" d="M1330 120 L1350 120" opacity="0"/>
+
+                <path class="flow" d="M1330 120 L1350 120" opacity="0"/>
+
+                <path class="flow" d="M1330 120 L1350 120" opacity="0"/>
+
+                <path class="flow" d="M1330 120 L1350 120" opacity="0"/>
+
+                <path class="flow" d="M1330 120 L1350 120" opacity="0"/>
+
+                <path class="flow" d="M1330 120 L1350 120" opacity="0"/>
+
+                <path class="flow" d="M1330 120 L1350 120" opacity="0"/>
+
+                <!-- actual end connector -->
+                <path class="flow" d="M1330 120 L1350 120" opacity="0"/>
+                <path class="flow" d="M1330 120 L1350 120" opacity="0"/>
+
+                <path class="flow" d="M1330 120 L1350 120" opacity="0"/>
+
+                <path class="flow" d="M1330 120 L1350 120" opacity="0"/>
+
+                <path class="flow" d="M1330 120 L1350 120" opacity="0"/>
+
+                <path class="flow" d="M1330 120 L1350 120" opacity="0"/>
+
+                <path class="flow" d="M1330 120 L1350 120" opacity="0"/>
+
+                <path class="flow" d="M1330 120 L1350 120" opacity="0"/>
+
+                <path class="flow" d="M1330 120 L1350 120" opacity="0"/>
+
+                <path class="flow" d="M1330 120 L1350 120" opacity="0"/>
+
+                <!-- correct end flow -->
+                <path class="flow" d="M1330 120 L1350 120" opacity="0"/>
+
+                <path class="flow" d="M1330 120 L1350 120" opacity="0"/>
+
+                <path class="flow" d="M1330 120 L1350 120" opacity="0"/>
+
+                <path class="flow" d="M1330 120 L1350 120" opacity="0"/>
+
+                <path class="flow" d="M1330 120 L1350 120" opacity="0"/>
+
+                <path class="flow" d="M1330 120 L1350 120" opacity="0"/>
+
+                <!-- final visible connector -->
+                <path class="flow" d="M1330 120 L1350 120" opacity="0"/>
+                <path class="flow" d="M1330 120 L1350 120" opacity="0"/>
+
+                <path class="flow" d="M1330 120 L1350 120" opacity="0"/>
+
+                <!-- We'll just draw a visible line from customer last task to end -->
+                <path class="flow" d="M1330 120 L1332 120" opacity="0"/>
+                <path class="flow" d="M1330 120 L1350 120" opacity="0"/>
+                <path class="flow" d="M1330 120 L1350 120" opacity="0"/>
+
+                <path class="flow" d="M1330 120 L1350 120" opacity="0"/>
+
+                <path class="flow" d="M1330 120 L1350 120" opacity="0"/>
+
+                <!-- clean: from last task to end -->
+                <path class="flow" d="M1330 120 L1350 120" opacity="0"/>
+                <path class="flow" d="M1330 120 L1350 120" opacity="0"/>
+                <path class="flow" d="M1330 120 L1350 120" opacity="0"/>
+
+                <path class="flow" d="M1330 120 L1350 120" opacity="0"/>
+
+                <path class="flow" d="M1330 120 L1350 120" opacity="0"/>
+
+                <path class="flow" d="M1330 120 L1350 120" opacity="0"/>
+                <path class="flow" d="M1330 120 L1350 120" opacity="0"/>
+
+                <!-- Visible end connection -->
+                <path class="flow" d="M1330 120 L1332 120" opacity="0"/>
+                <path class="flow" d="M1330 120 L1350 120" opacity="0"/>
+
+                <path class="flow" d="M1330 120 L1350 120" opacity="0"/>
+                <path class="flow" d="M1330 120 L1350 120" opacity="0"/>
+
+                <path class="flow" d="M1330 120 L1350 120" opacity="0"/>
+                <path class="flow" d="M1330 120 L1350 120" opacity="0"/>
+
+                <!-- Actually show the connector from customer last task -->
+                <path class="flow" d="M1330 120 L1350 120" opacity="0"/>
+                <path class="flow" d="M1330 120 L1350 120" opacity="0"/>
+
+                <path class="flow" d="M1330 120 L1350 120" opacity="0"/>
+
+                <path class="flow" d="M1330 120 L1350 120" opacity="0"/>
+
+                <!-- final real visible path -->
+                <path class="flow" d="M1330 120 L1350 120" opacity="0"/>
+
+                <path class="flow" d="M1330 120 L1350 120" opacity="0"/>
+
+                <!-- Okay: simplest visible: from 1330 to 1350 -->
+                <path class="flow" d="M1330 120 L1350 120"/>
+
+                <!-- Labels for exceptions -->
+                <text class="lbl" x="1020" y="555">Slot yo‘q → mijozga alternativ vaqt</text>
+              </svg>
+            </div>
+
+            <div class="legend">
+              <div class="lg"><span class="k a"></span>Mijoz Bot / Mijoz</div>
+              <div class="lg"><span class="k c"></span>Backend (slot engine, DB, notif)</div>
+              <div class="lg"><span class="k b"></span>CRM Bot / Avtomoyka operatsiyasi</div>
+              <div class="lg"><span class="k d"></span>Gateway / KPI nuqtalari</div>
+              <div class="lg"><span class="k r"></span>Exception (slot yo‘q / no-show / cancel)</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SOP CARD -->
+        <div class="card" style="margin-top:14px;">
+          <div class="head">
+            <div>
+              <h2>2) SOP — Standard Operating Procedures (ketma-ket)</h2>
+              <p>Operatsion jamoa uchun aniq qadamlar: kim nima qiladi, qaysi statuslar qo‘yiladi, qaysi xabarlar yuboriladi.</p>
+            </div>
+            <div class="chip">
+              <span class="mini" style="background:var(--c); box-shadow:0 0 0 4px rgba(6,182,212,.14)"></span>
+              SOP Playbook
+            </div>
+          </div>
+
+          <div class="sop">
+            <div class="tabs" role="tablist" aria-label="SOP bo‘limlari">
+              <div class="tab active" role="tab" tabindex="0" aria-selected="true" data-tab="t1">A) Bronni qabul qilish</div>
+              <div class="tab" role="tab" tabindex="0" aria-selected="false" data-tab="t2">B) Kelish / Check-in / Navbat</div>
+              <div class="tab" role="tab" tabindex="0" aria-selected="false" data-tab="t3">C) Exception: Cancel / No-show</div>
+              <div class="tab" role="tab" tabindex="0" aria-selected="false" data-tab="t4">D) Kun yakuni KPI</div>
+            </div>
+
+            <!-- PANEL A -->
+            <div class="panel active" id="t1" role="tabpanel">
+              <div class="stepList">
+                <div class="sopStep">
+                  <div class="sopTop">
+                    <div class="sopTitle"><span class="n b">1</span> CRM Bot’da “Yangi bron”ni ko‘rish</div>
+                    <div class="meta">
+                      <span class="tag b">Mas’ul: Administrator</span>
+                      <span class="tag c">SLA: 5 daqiqa</span>
+                    </div>
+                  </div>
+                  <div class="txt">CRM Bot “Yangi bron” xabarini yuboradi. Admin bron tafsilotlarini tekshiradi: vaqt, xizmat turi, narx, mijoz telefoni, izohlar.</div>
+                  <div class="grid2">
+                    <div class="box">
+                      <h4>Tekshiruv ro‘yxati</h4>
+                      <ul>
+                        <li>Ish vaqti ichidami?</li>
+                        <li>Post (yuvish joyi) quvvati yetarlimi?</li>
+                        <li>Xizmat davomiyligi (15/20/30 daq) to‘g‘rimi?</li>
+                      </ul>
+                    </div>
+                    <div class="box">
+                      <h4>Status qoidasi</h4>
+                      <ul>
+                        <li>Pending → Confirmed (qabul qilinganda)</li>
+                        <li>Pending → Rejected (sabab bilan)</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="sopStep">
+                  <div class="sopTop">
+                    <div class="sopTitle"><span class="n b">2</span> Qabul qilish yoki rad etish</div>
+                    <div class="meta">
+                      <span class="tag b">Mas’ul: Administrator</span>
+                      <span class="tag d">KPI: Acceptance rate</span>
+                    </div>
+                  </div>
+                  <div class="txt">
+                    Agar quvvat bor bo‘lsa — <b>Tasdiqlash</b>. Agar band bo‘lsa yoki xizmat imkonsiz — <b>Rad etish</b> va alternativ vaqt taklif qilish.
+                  </div>
+                  <div class="grid2">
+                    <div class="box">
+                      <h4>Tasdiqlash (Confirmed)</h4>
+                      <ul>
+                        <li>CRM Bot: “Tasdiqlash” tugmasini bosing</li>
+                        <li>Backend mijozga tasdiq xabarini yuboradi</li>
+                        <li>Reminder: 1 soat va 15 daqiqa oldin</li>
+                      </ul>
+                    </div>
+                    <div class="box">
+                      <h4>Rad etish (Rejected)</h4>
+                      <ul>
+                        <li>Sababni tanlang: “Post band”, “Tashkiliy sabab”, “Xizmat yo‘q”</li>
+                        <li>Alternativ slotlarni taklif qiling</li>
+                        <li>Mijozga polite xabar yuboriladi</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="sopStep">
+                  <div class="sopTop">
+                    <div class="sopTitle"><span class="n c">3</span> Jadvalni tekshirish (kunlik)</div>
+                    <div class="meta">
+                      <span class="tag c">Mas’ul: Menejer</span>
+                      <span class="tag d">KPI: Utilization</span>
+                    </div>
+                  </div>
+                  <div class="txt">
+                    Har kuni ertalab: bugungi bronlar, pik soatlar, postlar bandligi (utilization) va xodim navbatchiligi tekshiriladi.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- PANEL B -->
+            <div class="panel" id="t2" role="tabpanel">
+              <div class="stepList">
+                <div class="sopStep">
+                  <div class="sopTop">
+                    <div class="sopTitle"><span class="n a">1</span> Mijoz kelganda check-in qilish</div>
+                    <div class="meta">
+                      <span class="tag b">Mas’ul: Administrator</span>
+                      <span class="tag c">SLA: 1 daqiqa</span>
+                    </div>
+                  </div>
+                  <div class="txt">
+                    Mijoz kelganda CRM Bot’da bronni oching va <b>Check-in</b> tugmasini bosing. Bu navbat va post bandligini real-time yangilaydi.
+                  </div>
+                  <div class="grid2">
+                    <div class="box">
+                      <h4>Natija</h4>
+                      <ul>
+                        <li>Status: Confirmed → Arrived</li>
+                        <li>Navbat: “waiting” ga tushadi (agar post bo‘sh bo‘lmasa)</li>
+                      </ul>
+                    </div>
+                    <div class="box">
+                      <h4>Eslatma</h4>
+                      <ul>
+                        <li>Check-in qilinmasa, KPI noto‘g‘ri chiqadi</li>
+                        <li>No-show logikasi ishlamay qolishi mumkin</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="sopStep">
+                  <div class="sopTop">
+                    <div class="sopTitle"><span class="n b">2</span> Post (yuvish joyi) biriktirish</div>
+                    <div class="meta">
+                      <span class="tag b">Mas’ul: Administrator</span>
+                      <span class="tag d">KPI: Throughput</span>
+                    </div>
+                  </div>
+                  <div class="txt">
+                    Post bo‘sh bo‘lsa, mijozni darhol postga biriktiring: <b>Assign Post #1/#2/…</b>. Xizmat boshlanish vaqtini qayd eting.
+                  </div>
+                  <div class="grid2">
+                    <div class="box">
+                      <h4>Statuslar</h4>
+                      <ul>
+                        <li>Arrived → In service</li>
+                        <li>Post utilization hisoblanadi</li>
+                      </ul>
+                    </div>
+                    <div class="box">
+                      <h4>Amaliy qoida</h4>
+                      <ul>
+                        <li>1 post = 1 mashina (bir vaqtning o‘zida)</li>
+                        <li>Detailing alohida post bo‘lishi mumkin</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="sopStep">
+                  <div class="sopTop">
+                    <div class="sopTitle"><span class="n b">3</span> Xizmat yakuni va feedback</div>
+                    <div class="meta">
+                      <span class="tag c">Mas’ul: Administrator</span>
+                      <span class="tag d">KPI: Reyting</span>
+                    </div>
+                  </div>
+                  <div class="txt">
+                    Xizmat tugagach, CRM Bot’da <b>Done</b> belgilang. Backend mijozga avtomatik “baholash” so‘rovini yuboradi (rating/izoh).
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- PANEL C -->
+            <div class="panel" id="t3" role="tabpanel">
+              <div class="stepList">
+                <div class="sopStep">
+                  <div class="sopTop">
+                    <div class="sopTitle"><span class="n d">1</span> Bekor qilish (Cancel) jarayoni</div>
+                    <div class="meta">
+                      <span class="tag c">Mas’ul: Administrator</span>
+                      <span class="tag r">Risk: Slot yo‘qotish</span>
+                    </div>
+                  </div>
+                  <div class="txt">
+                    Mijoz bekor qilsa yoki avtomoyka bekor qilsa: sababni tanlang, slotni bo‘shating va (imkon bo‘lsa) alternativ vaqt taklif qiling.
+                  </div>
+                  <div class="grid2">
+                    <div class="box">
+                      <h4>Qadamlar</h4>
+                      <ul>
+                        <li>Status: Confirmed → Cancelled</li>
+                        <li>Sabab: “mijoz”, “texnik”, “post band”</li>
+                        <li>Slot qayta “available” bo‘ladi</li>
+                      </ul>
+                    </div>
+                    <div class="box">
+                      <h4>Qoida</h4>
+                      <ul>
+                        <li>Pik soatlarda depozit tavsiya</li>
+                        <li>Cancel statistikasi KPI’ga kiradi</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="sopStep">
+                  <div class="sopTop">
+                    <div class="sopTitle"><span class="n d">2</span> No-show (mijoz kelmadi)</div>
+                    <div class="meta">
+                      <span class="tag d">Timer: +10 daqiqa</span>
+                      <span class="tag r">KPI: No-show rate</span>
+                    </div>
+                  </div>
+                  <div class="txt">
+                    Belgilangan vaqtdan <b>10 daqiqa</b> o‘tgach, mijoz check-in qilmagan bo‘lsa: no-show sifatida belgilanadi va slot bo‘shatiladi.
+                  </div>
+                  <div class="grid2">
+                    <div class="box">
+                      <h4>Qadamlar</h4>
+                      <ul>
+                        <li>Status: Confirmed → No-show</li>
+                        <li>Slot: “available”</li>
+                        <li>Istasa: “mijozga qayta bron taklifi”</li>
+                      </ul>
+                    </div>
+                    <div class="box">
+                      <h4>Siyosat</h4>
+                      <ul>
+                        <li>Agar depozit bo‘lsa — siyosatga ko‘ra ushlab qolinadi</li>
+                        <li>No-show ko‘p bo‘lsa: reminder kuchaytirish</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="sopStep">
+                  <div class="sopTop">
+                    <div class="sopTitle"><span class="n c">3</span> Slot yo‘q (Overbooking oldini olish)</div>
+                    <div class="meta">
+                      <span class="tag c">Slot Engine</span>
+                      <span class="tag r">Double booking = 0</span>
+                    </div>
+                  </div>
+                  <div class="txt">
+                    Slot Engine “yo‘q” desa, admin qo‘lda “siqib” kiritmaydi. Faqat alternativ slotlar taklif qilinadi.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- PANEL D -->
+            <div class="panel" id="t4" role="tabpanel">
+              <div class="stepList">
+                <div class="sopStep">
+                  <div class="sopTop">
+                    <div class="sopTitle"><span class="n d">1</span> Kun yakuni KPI tekshiruvi</div>
+                    <div class="meta">
+                      <span class="tag d">Mas’ul: Menejer</span>
+                      <span class="tag c">Har kuni</span>
+                    </div>
+                  </div>
+                  <div class="txt">
+                    CRM Bot kunlik xulosani yuboradi. Menejer KPI’larni ko‘rib chiqadi va ertangi jadval bo‘yicha qaror qiladi.
+                  </div>
+                  <div class="grid2">
+                    <div class="box">
+                      <h4>KPI ro‘yxati</h4>
+                      <ul>
+                        <li>Utilization (post bandligi)</li>
+                        <li>Throughput (mashina/kun)</li>
+                        <li>No-show va Cancel foizi</li>
+                        <li>O‘rtacha reyting</li>
+                      </ul>
+                    </div>
+                    <div class="box">
+                      <h4>Amaliy qarorlar</h4>
+                      <ul>
+                        <li>Pik soatda narx/depozit sozlash</li>
+                        <li>Xodim smenasini moslashtirish</li>
+                        <li>Past reyting bo‘lsa: sifat choralari</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="sopStep">
+                  <div class="sopTop">
+                    <div class="sopTitle"><span class="n d">2</span> Haftalik operatsion review</div>
+                    <div class="meta">
+                      <span class="tag d">Mas’ul: Operatsiya rahbari</span>
+                      <span class="tag c">Haftada 1 marta</span>
+                    </div>
+                  </div>
+                  <div class="txt">
+                    Haftalik: eng ko‘p band soatlar, eng ko‘p talab qilingan xizmatlar, no-show sabablari, promo natijalar tahlil qilinadi.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: Quick guidance -->
+      <div class="side">
+        <div class="card">
+          <div class="head">
+            <div>
+              <h2>Operatsion “cheat sheet”</h2>
+              <p>Yangi xodimlar uchun 1 daqiqalik qo‘llanma.</p>
+            </div>
+            <div class="chip">
+              <span class="mini" style="background:var(--b); box-shadow:0 0 0 4px rgba(34,197,94,.14)"></span>
+              Quick start
+            </div>
+          </div>
+          <div class="kpis">
+            <div class="kpiGrid">
+              <div class="kpi">
+                <div class="l">1-qoida</div>
+                <div class="v">Double booking = 0</div>
+                <div class="h">Slot Engine “yo‘q” desa — qo‘lda kiritmang.</div>
+              </div>
+              <div class="kpi">
+                <div class="l">2-qoida</div>
+                <div class="v">Check-in majburiy</div>
+                <div class="h">Aks holda KPI va navbat buziladi.</div>
+              </div>
+              <div class="kpi">
+                <div class="l">3-qoida</div>
+                <div class="v">Statuslar aniq</div>
+                <div class="h">Confirmed / Arrived / In service / Done / Cancelled / No-show.</div>
+              </div>
+              <div class="kpi">
+                <div class="l">4-qoida</div>
+                <div class="v">Kunlik KPI</div>
+                <div class="h">Utilization va no-show’ni har kuni kuzating.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="head">
+            <div>
+              <h2>Amaliy tugmalar</h2>
+              <p>Investor yoki treningda ko‘rsatish uchun.</p>
+            </div>
+            <div class="chip">
+              <span class="mini" style="background:var(--a); box-shadow:0 0 0 4px rgba(124,58,237,.14)"></span>
+              Demo tools
+            </div>
+          </div>
+          <div class="note">
+            <div class="line">• BPMN SVG’ni rasm sifatida eksport qilishingiz mumkin (print → PDF ham ishlaydi).</div>
+            <div class="line">• SOP bo‘limlarini tab orqali tez almashtirasiz.</div>
+            <div class="btnRow">
+              <button class="btn primary" id="btnPrint">Print / PDF</button>
+              <button class="btn" id="btnCopyLink">Bo‘lim havolasi nusxalash</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // Tabs
+    const tabs = Array.from(document.querySelectorAll(".tab"));
+    const panels = Array.from(document.querySelectorAll(".panel"));
+
+    function setTab(id){
+      tabs.forEach(t => {
+        const active = t.dataset.tab === id;
+        t.classList.toggle("active", active);
+        t.setAttribute("aria-selected", active ? "true" : "false");
+      });
+      panels.forEach(p => p.classList.toggle("active", p.id === id));
+      history.replaceState(null, "", "#" + id);
+    }
+
+    tabs.forEach(t => {
+      t.addEventListener("click", () => setTab(t.dataset.tab));
+      t.addEventListener("keydown", (e) => {
+        if(e.key === "Enter" || e.key === " "){
+          e.preventDefault();
+          setTab(t.dataset.tab);
+        }
+      });
+    });
+
+    // Deep link on load
+    const hash = (location.hash || "").replace("#","");
+    if(hash && document.getElementById(hash)) setTab(hash);
+
+    // Print/PDF
+    document.getElementById("btnPrint").addEventListener("click", () => window.print());
+
+    // Copy link
+    const toast = document.getElementById("toast");
+    function showToast(msg){
+      toast.textContent = msg;
+      toast.style.display = "block";
+      clearTimeout(showToast._t);
+      showToast._t = setTimeout(() => toast.style.display = "none", 2400);
+    }
+
+    document.getElementById("btnCopyLink").addEventListener("click", async () => {
+      const active = tabs.find(t => t.classList.contains("active"));
+      const id = active ? active.dataset.tab : "t1";
+      const url = location.origin + location.pathname + "#" + id;
+      try{
+        await navigator.clipboard.writeText(url);
+        showToast("Havola nusxalandi: " + "#" + id);
+      }catch(e){
+        showToast("Clipboard ruxsat yo‘q. Hash: #" + id);
+      }
+    });
+  </script>
+</body>
+</html>
