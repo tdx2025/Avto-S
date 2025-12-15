@@ -1,0 +1,1204 @@
+
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AutoWash Telegram Platformasi — Operatsion Ish Jarayoni</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg: #0b1220;
+      --panel: rgba(255,255,255,.06);
+      --panel2: rgba(255,255,255,.04);
+      --stroke: rgba(255,255,255,.10);
+      --stroke2: rgba(255,255,255,.14);
+      --text: rgba(255,255,255,.90);
+      --muted: rgba(255,255,255,.68);
+      --muted2: rgba(255,255,255,.52);
+
+      --a: #7c3aed;   /* purple */
+      --b: #22c55e;   /* green */
+      --c: #06b6d4;   /* cyan */
+      --d: #f59e0b;   /* amber */
+
+      --shadow: 0 20px 60px rgba(0,0,0,.45);
+      --shadow2: 0 10px 30px rgba(0,0,0,.35);
+      --radius: 18px;
+
+      --max: 1200px;
+    }
+
+    *{ box-sizing: border-box; }
+    html, body{ height: 100%; }
+    body{
+      margin:0;
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(900px 500px at 20% 10%, rgba(124,58,237,.25), transparent 55%),
+        radial-gradient(700px 400px at 85% 15%, rgba(6,182,212,.18), transparent 55%),
+        radial-gradient(900px 700px at 60% 85%, rgba(34,197,94,.12), transparent 60%),
+        linear-gradient(180deg, #070b14 0%, var(--bg) 35%, #070b14 100%);
+      overflow-x: hidden;
+    }
+
+    .noise{
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='.20'/%3E%3C/svg%3E");
+      opacity: .06;
+      pointer-events: none;
+      mix-blend-mode: overlay;
+    }
+
+    .wrap{
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 28px 18px 42px;
+    }
+
+    .top{
+      display:flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+    .brand{
+      display:flex;
+      align-items:center;
+      gap: 12px;
+    }
+    .logo{
+      width: 44px; height: 44px;
+      border-radius: 14px;
+      background:
+        radial-gradient(12px 12px at 30% 30%, rgba(255,255,255,.45), transparent 55%),
+        linear-gradient(135deg, rgba(124,58,237,.85), rgba(6,182,212,.80));
+      box-shadow: 0 14px 40px rgba(124,58,237,.18);
+      border: 1px solid rgba(255,255,255,.14);
+      position: relative;
+      overflow:hidden;
+    }
+    .logo:after{
+      content:"";
+      position:absolute; inset:-40%;
+      background: linear-gradient(120deg, transparent, rgba(255,255,255,.22), transparent);
+      transform: rotate(18deg);
+      animation: shine 4.6s ease-in-out infinite;
+    }
+    @keyframes shine{
+      0%, 70%{ transform: translateX(-40%) rotate(18deg); opacity: 0; }
+      85%{ opacity: 1; }
+      100%{ transform: translateX(40%) rotate(18deg); opacity: 0; }
+    }
+
+    .title h1{
+      font-size: 18px;
+      margin:0;
+      letter-spacing: .2px;
+      line-height: 1.15;
+    }
+    .title p{
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+      max-width: 680px;
+    }
+
+    .pillrow{
+      display:flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: flex-end;
+      align-items: center;
+      margin-top: 2px;
+    }
+    .pill{
+      display:flex;
+      align-items:center;
+      gap: 8px;
+      padding: 10px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.10);
+      box-shadow: var(--shadow2);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      font-size: 12px;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+    .dot{
+      width: 8px; height: 8px; border-radius: 999px;
+      background: var(--c);
+      box-shadow: 0 0 0 4px rgba(6,182,212,.16);
+    }
+    .dot.b{ background: var(--b); box-shadow: 0 0 0 4px rgba(34,197,94,.14); }
+    .dot.a{ background: var(--a); box-shadow: 0 0 0 4px rgba(124,58,237,.16); }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1.35fr .65fr;
+      gap: 14px;
+      align-items: start;
+    }
+    @media (max-width: 980px){
+      .grid{ grid-template-columns: 1fr; }
+      .pillrow{ justify-content: flex-start; }
+    }
+
+    .card{
+      border-radius: 18px;
+      background: linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.04));
+      border: 1px solid rgba(255,255,255,.10);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+      position: relative;
+    }
+    .card .head{
+      padding: 16px 16px 12px;
+      display:flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.02);
+    }
+    .card .head h2{
+      margin:0;
+      font-size: 14px;
+      letter-spacing: .2px;
+    }
+    .card .head p{
+      margin:6px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+      max-width: 720px;
+    }
+    .chip{
+      display:inline-flex;
+      align-items:center;
+      gap: 8px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.10);
+      color: rgba(255,255,255,.82);
+      font-size: 12px;
+      white-space: nowrap;
+    }
+    .chip .mini{
+      width: 9px; height: 9px; border-radius: 999px;
+      background: var(--d);
+      box-shadow: 0 0 0 4px rgba(245,158,11,.14);
+    }
+
+    .workflow{
+      padding: 14px;
+      position: relative;
+    }
+    .lanes{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+    @media (max-width: 980px){
+      .lanes{ grid-template-columns: 1fr; }
+    }
+
+    .lane{
+      background: rgba(255,255,255,.03);
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 16px;
+      padding: 12px;
+      position: relative;
+      overflow:hidden;
+    }
+    .lane:before{
+      content:"";
+      position:absolute; inset:-1px;
+      background: radial-gradient(500px 120px at 20% 0%, rgba(124,58,237,.18), transparent 55%);
+      opacity: .7;
+      pointer-events: none;
+    }
+    .lane.crm:before{
+      background: radial-gradient(500px 120px at 20% 0%, rgba(34,197,94,.16), transparent 55%);
+    }
+    .lane h3{
+      margin:0;
+      font-size: 13px;
+      letter-spacing:.2px;
+      display:flex;
+      align-items:center;
+      justify-content: space-between;
+      gap: 10px;
+      position: relative;
+      z-index: 1;
+    }
+    .lane h3 span{
+      color: var(--muted);
+      font-weight: 500;
+      font-size: 12px;
+    }
+
+    .steps{
+      margin-top: 10px;
+      display:grid;
+      gap: 10px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .step{
+      border-radius: 14px;
+      padding: 10px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.04);
+      position: relative;
+      overflow:hidden;
+      transition: transform .18s ease, border-color .18s ease, background .18s ease;
+      cursor: pointer;
+    }
+    .step:hover{
+      transform: translateY(-1px);
+      border-color: rgba(255,255,255,.18);
+      background: rgba(255,255,255,.055);
+    }
+
+    .step .topline{
+      display:flex;
+      align-items:flex-start;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      gap: 8px;
+      font-size: 12px;
+      color: rgba(255,255,255,.88);
+      font-weight: 600;
+      letter-spacing: .1px;
+    }
+    .num{
+      width: 24px; height: 24px;
+      border-radius: 9px;
+      display:grid;
+      place-items:center;
+      font-size: 12px;
+      font-weight: 700;
+      color: rgba(255,255,255,.95);
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(124,58,237,.18);
+      box-shadow: 0 12px 22px rgba(124,58,237,.10);
+      flex: 0 0 auto;
+    }
+    .crm .num{
+      background: rgba(34,197,94,.16);
+      box-shadow: 0 12px 22px rgba(34,197,94,.10);
+    }
+
+    .tagrow{
+      display:flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+    }
+    .tag{
+      font-size: 11px;
+      padding: 5px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.10);
+      color: var(--muted);
+      background: rgba(255,255,255,.03);
+      white-space: nowrap;
+    }
+    .tag.c{ border-color: rgba(6,182,212,.25); color: rgba(190,250,255,.82); background: rgba(6,182,212,.08);}
+    .tag.b{ border-color: rgba(34,197,94,.22); color: rgba(198,255,221,.80); background: rgba(34,197,94,.07);}
+    .tag.d{ border-color: rgba(245,158,11,.22); color: rgba(255,233,198,.82); background: rgba(245,158,11,.07);}
+
+    .desc{
+      margin-top: 6px;
+      font-size: 12px;
+      line-height: 1.45;
+      color: var(--muted);
+    }
+
+    .lane .pipe{
+      position:absolute;
+      left: 23px;
+      top: 56px;
+      bottom: 20px;
+      width: 2px;
+      background: linear-gradient(180deg, rgba(255,255,255,.18), rgba(255,255,255,0));
+      opacity: .55;
+      z-index: 0;
+    }
+
+    .backend{
+      margin-top: 14px;
+      border-radius: 16px;
+      padding: 12px;
+      border: 1px dashed rgba(255,255,255,.18);
+      background: rgba(255,255,255,.03);
+      position: relative;
+      overflow:hidden;
+    }
+    .backend:before{
+      content:"";
+      position:absolute; inset:-1px;
+      background: radial-gradient(520px 140px at 60% 0%, rgba(6,182,212,.16), transparent 60%);
+      opacity: .9;
+      pointer-events:none;
+    }
+    .backend .row{
+      display:flex;
+      flex-wrap: wrap;
+      align-items:center;
+      justify-content: space-between;
+      gap: 10px;
+      position: relative;
+      z-index: 1;
+    }
+    .backend h4{
+      margin:0;
+      font-size: 13px;
+      letter-spacing:.2px;
+      display:flex;
+      align-items:center;
+      gap: 10px;
+    }
+    .backend h4 .icon{
+      width: 26px; height: 26px;
+      border-radius: 10px;
+      display:grid; place-items:center;
+      background: rgba(6,182,212,.12);
+      border: 1px solid rgba(6,182,212,.22);
+    }
+    .backend p{
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+      max-width: 720px;
+    }
+    .servicegrid{
+      display:grid;
+      grid-template-columns: repeat(3, minmax(0,1fr));
+      gap: 10px;
+      margin-top: 10px;
+      position: relative;
+      z-index: 1;
+    }
+    @media (max-width: 980px){
+      .servicegrid{ grid-template-columns: 1fr; }
+    }
+    .svc{
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.03);
+      padding: 10px;
+    }
+    .svc .t{
+      display:flex; align-items:center; justify-content: space-between; gap: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      color: rgba(255,255,255,.86);
+    }
+    .svc .t span{
+      font-size: 11px;
+      font-weight: 600;
+      color: rgba(255,255,255,.70);
+      border: 1px solid rgba(255,255,255,.12);
+      padding: 4px 7px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.03);
+    }
+    .svc .b{
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .side{
+      display:grid;
+      gap: 14px;
+    }
+
+    .kpis{
+      padding: 14px;
+    }
+    .kpiGrid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .kpi{
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.03);
+      padding: 10px;
+      position: relative;
+      overflow:hidden;
+    }
+    .kpi:before{
+      content:"";
+      position:absolute; inset:-1px;
+      background: radial-gradient(220px 80px at 20% 0%, rgba(124,58,237,.16), transparent 55%);
+      opacity:.75;
+      pointer-events:none;
+    }
+    .kpi:nth-child(2):before{ background: radial-gradient(220px 80px at 20% 0%, rgba(34,197,94,.14), transparent 55%); }
+    .kpi:nth-child(3):before{ background: radial-gradient(220px 80px at 20% 0%, rgba(6,182,212,.14), transparent 55%); }
+    .kpi:nth-child(4):before{ background: radial-gradient(220px 80px at 20% 0%, rgba(245,158,11,.14), transparent 55%); }
+
+    .kpi .label{
+      color: var(--muted);
+      font-size: 11px;
+      position: relative;
+      z-index: 1;
+    }
+    .kpi .val{
+      margin-top: 6px;
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: .2px;
+      position: relative;
+      z-index: 1;
+    }
+    .kpi .hint{
+      margin-top: 6px;
+      color: var(--muted2);
+      font-size: 11px;
+      line-height: 1.35;
+      position: relative;
+      z-index: 1;
+    }
+
+    .value{
+      padding: 14px;
+    }
+    .list{
+      margin-top: 10px;
+      display:grid;
+      gap: 10px;
+    }
+    .li{
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.03);
+      padding: 10px;
+      display:flex;
+      gap: 10px;
+      align-items:flex-start;
+    }
+    .ic{
+      width: 28px; height: 28px;
+      border-radius: 11px;
+      display:grid; place-items:center;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.04);
+      flex: 0 0 auto;
+    }
+    .li b{
+      display:block;
+      font-size: 12px;
+      margin: 0;
+      color: rgba(255,255,255,.88);
+      letter-spacing: .1px;
+    }
+    .li p{
+      margin: 3px 0 0;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
+    .modalBack{
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.55);
+      display:none;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      z-index: 999;
+    }
+    .modal{
+      width: min(760px, 96vw);
+      border-radius: 18px;
+      background: linear-gradient(180deg, rgba(255,255,255,.09), rgba(255,255,255,.05));
+      border: 1px solid rgba(255,255,255,.12);
+      box-shadow: 0 30px 90px rgba(0,0,0,.55);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      overflow:hidden;
+    }
+    .modalTop{
+      padding: 14px 14px 12px;
+      display:flex;
+      align-items:flex-start;
+      justify-content: space-between;
+      gap: 10px;
+      border-bottom: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.03);
+    }
+    .modalTop h3{
+      margin:0;
+      font-size: 14px;
+      letter-spacing:.2px;
+    }
+    .modalTop .close{
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.04);
+      color: rgba(255,255,255,.86);
+      padding: 8px 10px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 12px;
+    }
+    .modalBody{
+      padding: 14px;
+      display:grid;
+      gap: 12px;
+    }
+    .modalBody .grid2{
+      display:grid;
+      grid-template-columns: 1.15fr .85fr;
+      gap: 12px;
+    }
+    @media (max-width: 820px){
+      .modalBody .grid2{ grid-template-columns: 1fr; }
+    }
+    .box{
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.03);
+      padding: 12px;
+    }
+    .box h4{
+      margin:0;
+      font-size: 12px;
+      color: rgba(255,255,255,.86);
+      letter-spacing: .1px;
+    }
+    .box p, .box li{
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+    .box ul{
+      margin: 8px 0 0 18px;
+      padding:0;
+    }
+
+    .foot{
+      margin-top: 12px;
+      color: var(--muted2);
+      font-size: 11px;
+      line-height: 1.4;
+      padding: 10px 2px 0;
+    }
+
+    .kbd{
+      font-size: 11px;
+      color: rgba(255,255,255,.76);
+      border: 1px solid rgba(255,255,255,.14);
+      padding: 4px 7px;
+      border-radius: 8px;
+      background: rgba(255,255,255,.03);
+    }
+
+    svg{ display:block; }
+    .svg{ width: 16px; height: 16px; opacity: .95; }
+  </style>
+</head>
+<body>
+  <div class="noise"></div>
+
+  <div class="wrap">
+    <div class="top">
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div class="title">
+          <h1>Telegram’dagi AutoWash — Investorlar uchun sodda Operatsion Model</h1>
+          <p>
+            Ikki bot: <b>Mijoz Bot</b> (topish → band qilish → to‘lash → baholash) va <b>Car Wash CRM Bot</b>
+            (quvvat → jadval → navbat → mijoz tarixi → analitika). Ikkalasi ham bitta backend bilan ishlaydi.
+          </p>
+        </div>
+      </div>
+
+      <div class="pillrow">
+        <div class="pill"><span class="dot a"></span>Ikki-bot ekotizimi</div>
+        <div class="pill"><span class="dot"></span>Real-time slot engine</div>
+        <div class="pill"><span class="dot b"></span>Telegram’da CRM</div>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <div class="head">
+          <div>
+            <h2>Operatsion Ish Jarayoni (End-to-End)</h2>
+            <p>Har bir bosqichni bosing — “nima bo‘ladi”, “qaysi ma’lumot yaratiladi”, “investor qiymati” chiqadi.</p>
+          </div>
+          <div class="chip" title="Investor uchun qulay ko‘rinish">
+            <span class="mini"></span>
+            Investor ko‘rinishi
+          </div>
+        </div>
+
+        <div class="workflow">
+          <div class="lanes">
+            <div class="lane client">
+              <div class="pipe" aria-hidden="true"></div>
+              <h3>
+                Mijoz Bot (Avtomobil egasi) <span>Topish → Band qilish → Tajriba</span>
+              </h3>
+
+              <div class="steps">
+                <div class="step" data-step="client-1">
+                  <div class="topline">
+                    <div class="badge">
+                      <span class="num">1</span>
+                      Boshlash va Identifikatsiya
+                    </div>
+                    <span class="kbd">/start</span>
+                  </div>
+                  <div class="desc">Telefon / lokatsiya → mijoz profili va kontekst yaratiladi.</div>
+                  <div class="tagrow">
+                    <span class="tag c">Telegram Auth</span>
+                    <span class="tag">Geo</span>
+                    <span class="tag">Profil</span>
+                  </div>
+                </div>
+
+                <div class="step" data-step="client-2">
+                  <div class="topline">
+                    <div class="badge">
+                      <span class="num">2</span>
+                      Qidirish va Taqqoslash
+                    </div>
+                    <span class="kbd">Yaqin</span>
+                  </div>
+                  <div class="desc">Masofa, narx, xizmat turi, reyting, “hozir ochiq” bo‘yicha tanlash.</div>
+                  <div class="tagrow">
+                    <span class="tag">Katalog</span>
+                    <span class="tag c">Filtrlar</span>
+                    <span class="tag">Sharhlar</span>
+                  </div>
+                </div>
+
+                <div class="step" data-step="client-3">
+                  <div class="topline">
+                    <div class="badge">
+                      <span class="num">3</span>
+                      Slot va Xizmatni Tanlash
+                    </div>
+                    <span class="kbd">Kalendar</span>
+                  </div>
+                  <div class="desc">Real-time bandlik (quvvat hisobga olinadi). Double booking yo‘q.</div>
+                  <div class="tagrow">
+                    <span class="tag c">Slot Engine</span>
+                    <span class="tag">Quvvat</span>
+                    <span class="tag">Davomiylik</span>
+                  </div>
+                </div>
+
+                <div class="step" data-step="client-4">
+                  <div class="topline">
+                    <div class="badge">
+                      <span class="num">4</span>
+                      Tasdiqlash va To‘lov
+                    </div>
+                    <span class="kbd">Ixtiyoriy</span>
+                  </div>
+                  <div class="desc">Slot rezerv → bron tasdiq. Ixtiyoriy oldindan to‘lov / depozit.</div>
+                  <div class="tagrow">
+                    <span class="tag d">To‘lovlar</span>
+                    <span class="tag">Bron ID</span>
+                    <span class="tag">Qoida</span>
+                  </div>
+                </div>
+
+                <div class="step" data-step="client-5">
+                  <div class="topline">
+                    <div class="badge">
+                      <span class="num">5</span>
+                      Kelish, Check-in va Baholash
+                    </div>
+                    <span class="kbd">1-tap</span>
+                  </div>
+                  <div class="desc">Kelganda check-in → xizmat → baho/feedback → bonus/loyalty.</div>
+                  <div class="tagrow">
+                    <span class="tag b">Loyalty</span>
+                    <span class="tag">Feedback</span>
+                    <span class="tag c">Retensiya</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="lane crm">
+              <div class="pipe" aria-hidden="true"></div>
+              <h3>
+                Car Wash CRM Bot <span>Operatsiya → Navbat → Hisobot</span>
+              </h3>
+
+              <div class="steps">
+                <div class="step" data-step="crm-1">
+                  <div class="topline">
+                    <div class="badge">
+                      <span class="num">1</span>
+                      Avtomoykani Ro‘yxatdan O‘tkazish
+                    </div>
+                    <span class="kbd">Egasi</span>
+                  </div>
+                  <div class="desc">Manzil, ish vaqti, postlar (bays), xizmatlar, narx, davomiylik.</div>
+                  <div class="tagrow">
+                    <span class="tag b">Sozlash</span>
+                    <span class="tag">Xizmatlar</span>
+                    <span class="tag">Quvvat</span>
+                  </div>
+                </div>
+
+                <div class="step" data-step="crm-2">
+                  <div class="topline">
+                    <div class="badge">
+                      <span class="num">2</span>
+                      Bronlarni Boshqarish
+                    </div>
+                    <span class="kbd">Bugun</span>
+                  </div>
+                  <div class="desc">Qabul qilish/avto-qabul, ko‘chirish, bekor qilish, no-show.</div>
+                  <div class="tagrow">
+                    <span class="tag c">Status</span>
+                    <span class="tag">Qoidalar</span>
+                    <span class="tag">Xabarlar</span>
+                  </div>
+                </div>
+
+                <div class="step" data-step="crm-3">
+                  <div class="topline">
+                    <div class="badge">
+                      <span class="num">3</span>
+                      Navbat va Post Ta’minoti
+                    </div>
+                    <span class="kbd">Live</span>
+                  </div>
+                  <div class="desc">Kelishni belgilash → post/jamoaga biriktirish → kutish vaqti yangilanadi.</div>
+                  <div class="tagrow">
+                    <span class="tag c">Real-time</span>
+                    <span class="tag">Check-in</span>
+                    <span class="tag">Operatsiya</span>
+                  </div>
+                </div>
+
+                <div class="step" data-step="crm-4">
+                  <div class="topline">
+                    <div class="badge">
+                      <span class="num">4</span>
+                      Mijoz Tarixi (Mini-CRM)
+                    </div>
+                    <span class="kbd">Profil</span>
+                  </div>
+                  <div class="desc">Tashriflar, avtomobil(lar), afzal xizmatlar, ballar, eslatmalar.</div>
+                  <div class="tagrow">
+                    <span class="tag b">Retensiya</span>
+                    <span class="tag">Segment</span>
+                    <span class="tag">Upsell</span>
+                  </div>
+                </div>
+
+                <div class="step" data-step="crm-5">
+                  <div class="topline">
+                    <div class="badge">
+                      <span class="num">5</span>
+                      Analitika va Kunlik Xulosa
+                    </div>
+                    <span class="kbd">KPI</span>
+                  </div>
+                  <div class="desc">Utilizatsiya, daromad, pik soat, no-show, reyting trend.</div>
+                  <div class="tagrow">
+                    <span class="tag d">Daromad</span>
+                    <span class="tag c">Utilizatsiya</span>
+                    <span class="tag">Sifat</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="backend">
+            <div class="row">
+              <div>
+                <h4>
+                  <span class="icon" aria-hidden="true">
+                    <svg class="svg" viewBox="0 0 24 24" fill="none">
+                      <path d="M7 7h10v4H7V7Zm0 6h10v4H7v-4Z" stroke="rgba(255,255,255,.88)" stroke-width="1.6" stroke-linejoin="round"/>
+                      <path d="M5 4.8c0-.44.36-.8.8-.8h12.4c.44 0 .8.36.8.8v14.4c0 .44-.36.8-.8.8H5.8c-.44 0-.8-.36-.8-.8V4.8Z" stroke="rgba(255,255,255,.65)" stroke-width="1.4"/>
+                    </svg>
+                  </span>
+                  Umumiy Backend Servislar (Bitta “Source of Truth”)
+                </h4>
+                <p>
+                  Ikkala bot ham bitta backend’dan foydalanadi: katalog + slot engine + xabarnoma + to‘lov + sharh + loyalty + hisobot.
+                  Bu real-time aniqlik va shaharlar bo‘yicha tez kengayishni ta’minlaydi.
+                </p>
+              </div>
+
+              <div class="chip" title="Asosiy tamoyil: double booking yo‘q">
+                <span class="mini" style="background: var(--c); box-shadow: 0 0 0 4px rgba(6,182,212,.14)"></span>
+                Real-time bandlik
+              </div>
+            </div>
+
+            <div class="servicegrid">
+              <div class="svc">
+                <div class="t">Slot Engine <span>core</span></div>
+                <div class="b">Har bir post (bay) bo‘yicha quvvatga asoslangan slotlar: davomiylik, buffer, bekor qilish/depozit qoidalari.</div>
+              </div>
+              <div class="svc">
+                <div class="t">Xabarnoma Hub <span>automation</span></div>
+                <div class="b">Tasdiq, eslatma, ko‘chirish, “navbat tayyor” alert, xizmatdan keyingi feedback so‘rovi.</div>
+              </div>
+              <div class="svc">
+                <div class="t">CRM Ma’lumotlar Qatlami <span>growth</span></div>
+                <div class="b">Mijoz tarixi, retensiya kampaniyalari, loyalty ballari, reytinglar va KPI hisobotlar.</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="foot">
+            Pitch uchun: monetizatsiya — avtomoyka abonent to‘lovi, bron komissiyasi, to‘lov komissiyasi, promo/ads, premium analitika.
+          </div>
+        </div>
+      </div>
+
+      <div class="side">
+        <div class="card">
+          <div class="head">
+            <div>
+              <h2>Investor Snapshot</h2>
+              <p>Investorlar uchun muhim: o‘sish, retensiya va unit economics.</p>
+            </div>
+            <div class="chip">
+              <span class="mini" style="background: var(--b); box-shadow: 0 0 0 4px rgba(34,197,94,.14)"></span>
+              KPI tayyor
+            </div>
+          </div>
+
+          <div class="kpis">
+            <div class="kpiGrid">
+              <div class="kpi">
+                <div class="label">Konversiya</div>
+                <div class="val">Qidiruv → Bron</div>
+                <div class="hint">Telegram ichida tez bron qilish konversiyani oshiradi.</div>
+              </div>
+              <div class="kpi">
+                <div class="label">Utilizatsiya</div>
+                <div class="val">Postlar / Soat</div>
+                <div class="hint">Slot engine bekor turishni kamaytiradi, navbatni boshqaradi.</div>
+              </div>
+              <div class="kpi">
+                <div class="label">Retensiya</div>
+                <div class="val">Qayta tashrif</div>
+                <div class="hint">Eslatma + loyalty + tarixga asoslangan takliflar.</div>
+              </div>
+              <div class="kpi">
+                <div class="label">Sifat</div>
+                <div class="val">Reyting / NPS</div>
+                <div class="hint">Sharhlar ishonchni oshiradi va o‘sish “flywheel”ini yaratadi.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="head">
+            <div>
+              <h2>Biznes Qiymati (Sodda)</h2>
+              <p>Marketplace’ning ikki tomoni uchun foyda.</p>
+            </div>
+            <div class="chip">
+              <span class="mini" style="background: var(--a); box-shadow: 0 0 0 4px rgba(124,58,237,.14)"></span>
+              Marketplace
+            </div>
+          </div>
+
+          <div class="value">
+            <div class="list">
+              <div class="li">
+                <div class="ic" aria-hidden="true">
+                  <svg class="svg" viewBox="0 0 24 24" fill="none">
+                    <path d="M5 12h14" stroke="rgba(255,255,255,.78)" stroke-width="1.6" stroke-linecap="round"/>
+                    <path d="M12 5v14" stroke="rgba(255,255,255,.78)" stroke-width="1.6" stroke-linecap="round"/>
+                  </svg>
+                </div>
+                <div>
+                  <b>Ko‘proq bronlar</b>
+                  <p>Discovery + real-time bandlik — niyatni tasdiqlangan bron’ga aylantiradi.</p>
+                </div>
+              </div>
+
+              <div class="li">
+                <div class="ic" aria-hidden="true">
+                  <svg class="svg" viewBox="0 0 24 24" fill="none">
+                    <path d="M7 7h10v10H7V7Z" stroke="rgba(255,255,255,.78)" stroke-width="1.6"/>
+                    <path d="M9 12h6" stroke="rgba(255,255,255,.78)" stroke-width="1.6" stroke-linecap="round"/>
+                  </svg>
+                </div>
+                <div>
+                  <b>Kamroq “haos”</b>
+                  <p>Navbat, post taqsimoti va xabarlar — qo‘lda ishni kamaytiradi.</p>
+                </div>
+              </div>
+
+              <div class="li">
+                <div class="ic" aria-hidden="true">
+                  <svg class="svg" viewBox="0 0 24 24" fill="none">
+                    <path d="M6 18V6" stroke="rgba(255,255,255,.78)" stroke-width="1.6" stroke-linecap="round"/>
+                    <path d="M6 18h12" stroke="rgba(255,255,255,.78)" stroke-width="1.6" stroke-linecap="round"/>
+                    <path d="M8.5 14.5l3-3 2 2 3.5-4" stroke="rgba(255,255,255,.78)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </div>
+                <div>
+                  <b>O‘lchanadigan o‘sish</b>
+                  <p>Kunlik KPI xulosalari — narx, ish vaqti, xodimlarni optimallashtirishga yordam beradi.</p>
+                </div>
+              </div>
+
+              <div class="li">
+                <div class="ic" aria-hidden="true">
+                  <svg class="svg" viewBox="0 0 24 24" fill="none">
+                    <path d="M12 21s7-4.5 7-11a7 7 0 1 0-14 0c0 6.5 7 11 7 11Z" stroke="rgba(255,255,255,.78)" stroke-width="1.6" stroke-linejoin="round"/>
+                    <path d="M12 11.5a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z" stroke="rgba(255,255,255,.78)" stroke-width="1.6"/>
+                  </svg>
+                </div>
+                <div>
+                  <b>Shaharlar bo‘yicha scale</b>
+                  <p>Telegram’da standart onboarding — yangi avtomoykalarni tez qo‘shish imkonini beradi.</p>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="modalBack" id="modalBack" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal">
+      <div class="modalTop">
+        <div>
+          <h3 id="modalTitle">Bosqich tafsilotlari</h3>
+          <div style="margin-top:6px; color: rgba(255,255,255,.60); font-size: 12px;" id="modalSub">Orqa fonda nima bo‘ladi</div>
+        </div>
+        <button class="close" id="modalClose">Yopish</button>
+      </div>
+
+      <div class="modalBody">
+        <div class="grid2">
+          <div class="box">
+            <h4>Nima bo‘ladi</h4>
+            <p id="modalWhat" style="margin:8px 0 0;"></p>
+          </div>
+
+          <div class="box">
+            <h4>Yaratilgan / yangilangan ma’lumotlar</h4>
+            <ul id="modalData"></ul>
+          </div>
+        </div>
+
+        <div class="box">
+          <h4>Investor qiymati</h4>
+          <p id="modalValue" style="margin:8px 0 0;"></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const DATA = {
+      "client-1": {
+        title: "Mijoz Bot — 1-bosqich: Boshlash va Identifikatsiya",
+        sub: "Telegram ichida tez onboarding",
+        what: "Foydalanuvchi botni ochadi, telefon raqamini ulashadi (Telegram’ga qulay) va ixtiyoriy lokatsiya yuboradi. Tizim mijoz profilini yaratadi va mos qidiruv tajribasini tayyorlaydi.",
+        data: [
+          "Mijoz profili (Telegram ID, telefon, til)",
+          "Lokatsiya konteksti (lat/lng, shahar)",
+          "Avto ma’lumotlari (ixtiyoriy: raqam, turi)"
+        ],
+        value: "Kirishdagi to‘siqlar kamayadi → konversiya oshadi. Tasdiqlangan telefon eslatmalarni ishonchli qiladi va no-show’larni kamaytiradi."
+      },
+      "client-2": {
+        title: "Mijoz Bot — 2-bosqich: Qidirish va Taqqoslash",
+        sub: "Marketplace discovery + ishonch signallari",
+        what: "Bot yaqin avtomoykalarni ko‘rsatadi va xizmat turi, narx, reyting, bandlik, “hozir ochiq” bo‘yicha filtrlash imkonini beradi. Sharhlar va fotosuratlar tanlovni osonlashtiradi.",
+        data: [
+          "Qidiruv hodisalari (analitika uchun)",
+          "Tanlangan filtrlar va afzalliklar",
+          "Ko‘rishlar (impressions) va bosishlar (clicks)"
+        ],
+        value: "Tanlov sifati va ishonch oshadi → bronlar ko‘payadi. Qidiruv analitikasi promo joylashtirishlar orqali monetizatsiyani kuchaytiradi."
+      },
+      "client-3": {
+        title: "Mijoz Bot — 3-bosqich: Slot va Xizmatni Tanlash",
+        sub: "Real-time slot engine double booking’ni yo‘q qiladi",
+        what: "Foydalanuvchi xizmat va vaqtni tanlaydi. Backend slotlarni postlar (bays) soni, xizmat davomiyligi va buffer qoidalariga ko‘ra real-time hisoblaydi.",
+        data: [
+          "Tanlangan xizmat paketi",
+          "Slot rezerv (vaqtincha lock)",
+          "Har bir vaqt/post bo‘yicha quvvat hisoblagichlari"
+        ],
+        value: "Quvvatga asoslangan rejalashtirish utilizatsiyani oshiradi (kuniga ko‘proq mashina) va navbatlarni kamaytiradi — avtomoykalar uchun asosiy foyda."
+      },
+      "client-4": {
+        title: "Mijoz Bot — 4-bosqich: Tasdiqlash va To‘lov (ixtiyoriy)",
+        sub: "Bron tasdiqi + depozit qoidalari",
+        what: "Foydalanuvchi bronni tasdiqlaydi. Ixtiyoriy oldindan to‘lov/depozit bekor qilish va no-show’larni kamaytiradi. Tasdiq va eslatmalar avtomatik rejalashtiriladi.",
+        data: [
+          "Bron yozuvi (ID, vaqt, xizmat, status)",
+          "To‘lov referensi (agar ishlatilsa)",
+          "Xabarnoma jadvali (eslatmalar)"
+        ],
+        value: "Ishonchlilik oshadi → daromad prognozi yaxshilanadi. Depozit siyosati pik soatlarda quvvatni himoya qiladi va unit economics’ni yaxshilaydi."
+      },
+      "client-5": {
+        title: "Mijoz Bot — 5-bosqich: Kelish, Check-in va Baholash",
+        sub: "Retention uchun yopiq sikl",
+        what: "Mijoz kelganda check-in qiladi, xizmat ko‘rsatiladi va bot baho/izoh so‘raydi. Loyalty ballari yoki kuponlar avtomatik berilishi mumkin.",
+        data: [
+          "Check-in va yakun vaqtlari",
+          "Reyting/sharh va ixtiyoriy eslatmalar",
+          "Loyalty ballari (ledger)"
+        ],
+        value: "Sharhlar ishonchni oshiradi. Loyalty va eslatmalar qayta tashriflarni ko‘paytiradi → LTV (umrbod qiymat) oshadi."
+      },
+
+      "crm-1": {
+        title: "CRM Bot — 1-bosqich: Avtomoykani Ro‘yxatdan O‘tkazish",
+        sub: "Telegram’da self-service sozlash",
+        what: "Egasi biznesni ro‘yxatdan o‘tkazadi: ish vaqti, postlar, xizmatlar, narxlar, davomiylik, foto va lokatsiya. Bu discovery va slot engine’ni ta’minlaydi.",
+        data: [
+          "Avtomoyka profili (nom, manzil, geo)",
+          "Ish vaqti va dam olish kalendari",
+          "Xizmatlar katalogi (davomiylik, narx)"
+        ],
+        value: "Onboarding arzon va tez. Standart ma’lumotlar shaharlar bo‘yicha scale qilishni osonlashtiradi."
+      },
+      "crm-2": {
+        title: "CRM Bot — 2-bosqich: Bronlarni Boshqarish",
+        sub: "Qabul qilish, ko‘chirish, siyosat",
+        what: "Xodimlar bugungi jadvalni ko‘radi, bronlarni qabul qiladi (yoki avto-qabul), ko‘chiradi, bekor qiladi va no-show holatlarini sabab bilan belgilaydi.",
+        data: [
+          "Bron statuslari (pending/confirmed/cancelled)",
+          "Reschedule hodisalari va sabablar",
+          "No-show statistikasi"
+        ],
+        value: "Operatsion nazorat tartibni oshiradi. No-show analitikasi depozit qoidalarini optimallashtiradi va ishonchlilikni oshiradi."
+      },
+      "crm-3": {
+        title: "CRM Bot — 3-bosqich: Navbat va Post Taqsimoti",
+        sub: "Live operatsiya va throughput",
+        what: "Mijoz kelganda check-in qilinadi, post/jamoa biriktiriladi, tizim kutish vaqti va bandlikni avtomatik yangilaydi.",
+        data: [
+          "Navbat holati (waiting/in service/done)",
+          "Post utilizatsiyasi timeline",
+          "Xizmat start/end vaqtlari"
+        ],
+        value: "Ko‘proq throughput va kamroq bekor turish → kunlik daromad oshadi. Operatsion data premium analitika uchun kuchli asos."
+      },
+      "crm-4": {
+        title: "CRM Bot — 4-bosqich: Mijoz Tarixi (Mini-CRM)",
+        sub: "Mahalliy biznes uchun retention",
+        what: "CRM mijoz tashriflari, afzal xizmatlar, eslatmalar va loyalty ballarini saqlaydi. Maqsadli takliflar yaratish mumkin (masalan, ‘wax chegirma’).",
+        data: [
+          "Tashriflar tarixi",
+          "Segmentlar (VIP, tez-tez, uzoq bo‘lgan)",
+          "Taklif va redemption tracking"
+        ],
+        value: "Retensiya arzonroq. CRM kuchli bo‘lsa, avtomoykalar platformada qoladi va bu oddiy ‘listing’dan farqlaydi."
+      },
+      "crm-5": {
+        title: "CRM Bot — 5-bosqich: Analitika va Kunlik Xulosa",
+        sub: "Owner-friendly KPI va trendlar",
+        what: "Bot kunlik/haftalik xulosalarni yuboradi: utilizatsiya, taxminiy daromad, pik soatlar, no-show/cancel foizi, reyting trend va jamoa samaradorligi.",
+        data: [
+          "KPI snapshot va trendlar",
+          "Peak hour aniqlash",
+          "Sifat metrikalari (reyting)"
+        ],
+        value: "Data-driven egalar obunada qoladi. KPI — monetizatsiya leveri (premium dashboard, benchmarking, tavsiyalar)."
+      }
+    };
+
+    const modalBack = document.getElementById("modalBack");
+    const modalClose = document.getElementById("modalClose");
+    const modalTitle = document.getElementById("modalTitle");
+    const modalSub = document.getElementById("modalSub");
+    const modalWhat = document.getElementById("modalWhat");
+    const modalData = document.getElementById("modalData");
+    const modalValue = document.getElementById("modalValue");
+
+    function openModal(key){
+      const d = DATA[key];
+      if(!d) return;
+
+      modalTitle.textContent = d.title;
+      modalSub.textContent = d.sub;
+      modalWhat.textContent = d.what;
+
+      modalData.innerHTML = "";
+      d.data.forEach(item => {
+        const li = document.createElement("li");
+        li.textContent = item;
+        modalData.appendChild(li);
+      });
+
+      modalValue.textContent = d.value;
+
+      modalBack.style.display = "flex";
+      document.body.style.overflow = "hidden";
+    }
+
+    function closeModal(){
+      modalBack.style.display = "none";
+      document.body.style.overflow = "";
+    }
+
+    document.querySelectorAll(".step").forEach(el => {
+      el.addEventListener("click", () => openModal(el.dataset.step));
+      el.addEventListener("keydown", (e) => {
+        if(e.key === "Enter" || e.key === " "){
+          e.preventDefault();
+          openModal(el.dataset.step);
+        }
+      });
+      el.setAttribute("tabindex", "0");
+      el.setAttribute("role", "button");
+      el.setAttribute("aria-label", "Bosqich tafsilotlarini ochish");
+    });
+
+    modalClose.addEventListener("click", closeModal);
+    modalBack.addEventListener("click", (e) => {
+      if(e.target === modalBack) closeModal();
+    });
+    document.addEventListener("keydown", (e) => {
+      if(e.key === "Escape" && modalBack.style.display === "flex") closeModal();
+    });
+  </script>
+</body>
+</html>
