@@ -1,0 +1,1749 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AutoWash CRM Bot - Complete Business Management</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #8B0000 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .phone-container {
+            width: 100%;
+            max-width: 450px;
+            height: 900px;
+            background: #ffffff;
+            border-radius: 40px;
+            box-shadow: 0 30px 100px rgba(0,0,0,0.5);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .phone-notch {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 150px;
+            height: 32px;
+            background: #000;
+            border-radius: 0 0 22px 22px;
+            z-index: 100;
+        }
+
+        .phone-header {
+            background: linear-gradient(135deg, #1e3c72 0%, #8B0000 100%);
+            padding: 55px 20px 25px;
+            color: white;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+
+        .bot-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 6px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .bot-subtitle {
+            font-size: 14px;
+            opacity: 0.95;
+            font-weight: 500;
+        }
+
+        .business-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255,255,255,0.25);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            margin-top: 12px;
+            font-weight: 700;
+            border: 2px solid rgba(255,255,255,0.3);
+        }
+
+        .chat-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background: linear-gradient(to bottom, #f8f9fa 0%, #e9ecef 100%);
+        }
+
+        .message {
+            margin-bottom: 16px;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message.bot {
+            display: flex;
+            justify-content: flex-start;
+        }
+
+        .message.user {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .message-bubble {
+            max-width: 90%;
+            padding: 16px 20px;
+            border-radius: 20px;
+            word-wrap: break-word;
+            position: relative;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.1);
+        }
+
+        .message.bot .message-bubble {
+            background: white;
+            border-bottom-left-radius: 4px;
+        }
+
+        .message.user .message-bubble {
+            background: linear-gradient(135deg, #1e3c72 0%, #8B0000 100%);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .message-time {
+            font-size: 11px;
+            color: #999;
+            margin-top: 8px;
+            text-align: right;
+        }
+
+        .message.user .message-time {
+            color: rgba(255,255,255,0.85);
+        }
+
+        /* CRM Dashboard Styles */
+        .crm-mega-dashboard {
+            background: linear-gradient(135deg, #1e3c72 0%, #8B0000 100%);
+            color: white;
+            border-radius: 20px;
+            padding: 25px;
+            margin: 15px 0;
+            box-shadow: 0 10px 40px rgba(30,60,114,0.4);
+        }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .dashboard-title {
+            font-size: 22px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .dashboard-time {
+            font-size: 11px;
+            opacity: 0.9;
+        }
+
+        .mega-stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .mega-stat-card {
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(10px);
+            padding: 18px;
+            border-radius: 14px;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .mega-stat-icon {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .mega-stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .mega-stat-label {
+            font-size: 12px;
+            opacity: 0.9;
+            font-weight: 600;
+        }
+
+        .revenue-mega-card {
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+            color: #000;
+            border-radius: 18px;
+            padding: 25px;
+            margin: 15px 0;
+            text-align: center;
+            box-shadow: 0 8px 30px rgba(255,215,0,0.4);
+        }
+
+        .revenue-label {
+            font-size: 14px;
+            font-weight: 700;
+            opacity: 0.8;
+            margin-bottom: 10px;
+        }
+
+        .revenue-amount {
+            font-size: 38px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .revenue-details {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 2px solid rgba(0,0,0,0.1);
+            font-size: 13px;
+            line-height: 1.8;
+        }
+
+        .queue-card {
+            background: white;
+            border-radius: 16px;
+            padding: 18px;
+            margin: 12px 0;
+            border-left: 5px solid #1e3c72;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+            position: relative;
+        }
+
+        .queue-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .queue-number {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1e3c72;
+        }
+
+        .queue-status {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .status-pending { background: #fff3cd; color: #856404; }
+        .status-confirmed { background: #d1ecf1; color: #0c5460; }
+        .status-washing { background: #d4edda; color: #155724; }
+        .status-completed { background: #e7d4f7; color: #6f42c1; }
+
+        .queue-details {
+            font-size: 13px;
+            line-height: 2;
+            color: #333;
+        }
+
+        .queue-actions {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .action-btn {
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+
+        .btn-accept { background: #28a745; color: white; }
+        .btn-start { background: #007bff; color: white; }
+        .btn-complete { background: #17a2b8; color: white; }
+        .btn-cancel { background: #dc3545; color: white; }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .customer-card {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 14px;
+            padding: 18px;
+            margin: 10px 0;
+            border-left: 4px solid #1e3c72;
+        }
+
+        .customer-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .customer-name {
+            font-size: 17px;
+            font-weight: 700;
+            color: #1e3c72;
+        }
+
+        .customer-badge {
+            background: #FFD700;
+            color: #000;
+            padding: 5px 12px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .customer-stats {
+            font-size: 13px;
+            line-height: 1.9;
+            color: #555;
+        }
+
+        .chart-card {
+            background: white;
+            border-radius: 16px;
+            padding: 25px;
+            margin: 15px 0;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+
+        .chart-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1e3c72;
+            margin-bottom: 20px;
+        }
+
+        .chart-container {
+            width: 100%;
+            height: 250px;
+        }
+
+        .analytics-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin: 15px 0;
+        }
+
+        .analytics-box {
+            background: white;
+            padding: 18px;
+            border-radius: 14px;
+            text-align: center;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+            border-top: 4px solid #1e3c72;
+        }
+
+        .analytics-icon {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .analytics-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1e3c72;
+            margin-bottom: 6px;
+        }
+
+        .analytics-label {
+            font-size: 12px;
+            color: #666;
+            font-weight: 600;
+        }
+
+        .broadcast-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 16px;
+            padding: 25px;
+            margin: 15px 0;
+            box-shadow: 0 8px 30px rgba(102,126,234,0.4);
+        }
+
+        .service-card {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            margin: 10px 0;
+            border-left: 4px solid #667eea;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+        }
+
+        .service-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .service-name {
+            font-size: 16px;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .service-price {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1e3c72;
+        }
+
+        .service-meta {
+            font-size: 12px;
+            color: #666;
+            display: flex;
+            gap: 15px;
+        }
+
+        .settings-card {
+            background: white;
+            border-radius: 14px;
+            padding: 20px;
+            margin: 10px 0;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+        }
+
+        .settings-item {
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            margin-bottom: 12px;
+        }
+
+        .settings-label {
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        .settings-value {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .keyboard {
+            background: white;
+            padding: 14px;
+            border-top: 2px solid #e0e0e0;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.08);
+        }
+
+        .keyboard-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .keyboard-button {
+            flex: 1;
+            padding: 16px 8px;
+            background: white;
+            border: 2px solid #1e3c72;
+            color: #1e3c72;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+            position: relative;
+        }
+
+        .keyboard-button:hover {
+            background: #1e3c72;
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 16px rgba(30,60,114,0.3);
+        }
+
+        .keyboard-button.primary {
+            background: linear-gradient(135deg, #1e3c72 0%, #8B0000 100%);
+            color: white;
+            border: none;
+        }
+
+        .inline-keyboard {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .inline-button {
+            padding: 14px 20px;
+            background: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 14px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .inline-button:hover {
+            background: #e9ecef;
+            border-color: #1e3c72;
+            transform: translateX(6px);
+        }
+
+        .typing-indicator {
+            display: none;
+            padding: 14px 20px;
+            background: white;
+            border-radius: 20px;
+            width: fit-content;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.1);
+        }
+
+        .typing-indicator span {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            background: #1e3c72;
+            border-radius: 50%;
+            margin: 0 3px;
+            animation: typing 1.4s infinite;
+        }
+
+        .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes typing {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-12px); }
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background: #dc3545;
+            color: white;
+            border-radius: 50%;
+            width: 26px;
+            height: 26px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 700;
+            box-shadow: 0 2px 8px rgba(220,53,69,0.4);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+        }
+
+        .alert-box {
+            padding: 14px 18px;
+            border-radius: 12px;
+            margin: 12px 0;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .alert-success {
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            color: #155724;
+            border-left: 5px solid #28a745;
+        }
+
+        .alert-info {
+            background: linear-gradient(135deg, #d1ecf1 0%, #bee5eb 100%);
+            color: #0c5460;
+            border-left: 5px solid #17a2b8;
+        }
+
+        .alert-warning {
+            background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+            color: #856404;
+            border-left: 5px solid #ffc107;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.85);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-container {
+            background: white;
+            padding: 35px;
+            border-radius: 24px;
+            max-width: 90%;
+            max-height: 80%;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .modal-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #1e3c72;
+            text-align: center;
+        }
+
+        .modal-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 12px;
+            font-size: 14px;
+            font-family: inherit;
+            margin-bottom: 15px;
+        }
+
+        .modal-textarea {
+            width: 100%;
+            height: 120px;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 12px;
+            font-size: 14px;
+            font-family: inherit;
+            resize: vertical;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 25px;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 16px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 15px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #1e3c72 0%, #8B0000 100%);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .hidden { display: none !important; }
+
+        .growth-indicator {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            margin-left: 8px;
+        }
+
+        .growth-up {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .tab-navigation {
+            display: flex;
+            background: white;
+            border-radius: 12px;
+            padding: 8px;
+            margin: 15px 0;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            background: transparent;
+            color: #666;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, #1e3c72 0%, #8B0000 100%);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="phone-container">
+        <div class="phone-notch"></div>
+        <div class="phone-header">
+            <div class="bot-title">🎯 AutoWash CRM</div>
+            <div class="bot-subtitle">Complete Business Management</div>
+            <div class="business-badge" id="businessBadge">
+                <span>🏢</span>
+                <span id="businessName">Premium Auto Wash</span>
+            </div>
+        </div>
+
+        <div class="chat-container" id="chatContainer">
+            <!-- Messages will be added here -->
+        </div>
+
+        <div class="typing-indicator" id="typingIndicator">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+
+        <div class="keyboard" id="keyboard">
+            <!-- Keyboard will be added here dynamically -->
+        </div>
+    </div>
+
+    <!-- QR Scanner Modal -->
+    <div class="modal-overlay" id="scannerModal">
+        <div class="modal-container">
+            <div class="modal-title">📷 QR Kod Skaner</div>
+            <input type="text" class="modal-input" id="scannerInput" placeholder="Buyurtma raqami: #WH-12345">
+            <div class="modal-buttons">
+                <button class="modal-btn btn-primary" onclick="processQRScan()">Qidirish</button>
+                <button class="modal-btn btn-secondary" onclick="closeScanner()">Yopish</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Broadcast Modal -->
+    <div class="modal-overlay" id="broadcastModal">
+        <div class="modal-container">
+            <div class="modal-title">📢 Xabar Yuborish</div>
+            <textarea class="modal-textarea" id="broadcastMessage" placeholder="Xabar matnini kiriting..."></textarea>
+            <div style="margin-bottom: 15px;">
+                <label style="font-weight: 600; display: block; margin-bottom: 8px;">Kimga?</label>
+                <select id="broadcastTarget" style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 10px; font-size: 14px;">
+                    <option value="all">Barcha mijozlar</option>
+                    <option value="vip">VIP mijozlar</option>
+                    <option value="active">Faol mijozlar (30 kun)</option>
+                    <option value="inactive">Nofaol mijozlar (90+ kun)</option>
+                </select>
+            </div>
+            <div class="modal-buttons">
+                <button class="modal-btn btn-primary" onclick="sendBroadcast()">📤 Yuborish</button>
+                <button class="modal-btn btn-secondary" onclick="closeBroadcast()">Bekor qilish</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Enhanced State Management
+        const state = {
+            business: null,
+            currentView: 'main',
+            queue: [],
+            customers: [],
+            stats: {
+                todayBookings: 0,
+                todayRevenue: 0,
+                monthBookings: 0,
+                monthRevenue: 0,
+                activeQueue: 0,
+                washing: 0,
+                totalCustomers: 0,
+                vipCustomers: 0,
+                avgRating: 0,
+                avgCheck: 0,
+                peakHours: [],
+                topServices: []
+            },
+            services: [],
+            financial: {
+                commission: 0.10,
+                monthlyCommission: 0,
+                netRevenue: 0,
+                projectedRevenue: 0
+            },
+            analytics: {
+                hourlyData: [],
+                weeklyData: [],
+                monthlyData: [],
+                customerRetention: 0,
+                growthRate: 0
+            }
+        };
+
+        // Enhanced Mock Data
+        const mockBookings = [
+            {
+                id: 1,
+                number: 'WH-12345',
+                customer: { name: 'Jamshid Karimov', phone: '+998901234567', car: 'Chevrolet Nexia', carNumber: '01 A 777 AA' },
+                service: 'Kompleks yuvish',
+                price: 50000,
+                status: 'pending',
+                position: 1,
+                createdAt: new Date()
+            },
+            {
+                id: 2,
+                number: 'WH-12346',
+                customer: { name: 'Sardor Alimov', phone: '+998902345678', car: 'Lacetti', carNumber: '01 B 888 BB' },
+                service: 'Ichki tozalash',
+                price: 40000,
+                status: 'pending',
+                position: 2,
+                createdAt: new Date()
+            },
+            {
+                id: 3,
+                number: 'WH-12347',
+                customer: { name: 'Bobur Tursunov', phone: '+998903456789', car: 'Spark', carNumber: '01 C 999 CC' },
+                service: 'VIP paket',
+                price: 200000,
+                status: 'washing',
+                position: null,
+                createdAt: new Date()
+            }
+        ];
+
+        const mockCustomers = [
+            { id: 1, name: 'Jamshid Karimov', phone: '+998901234567', visits: 25, spent: 1250000, rating: 5, car: 'Nexia', lastVisit: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000), vip: true },
+            { id: 2, name: 'Sardor Alimov', phone: '+998902345678', visits: 18, spent: 900000, rating: 4.8, car: 'Lacetti', lastVisit: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000), vip: true },
+            { id: 3, name: 'Bobur Tursunov', phone: '+998903456789', visits: 12, spent: 600000, rating: 4.5, car: 'Spark', lastVisit: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000), vip: false },
+            { id: 4, name: 'Aziz Rahimov', phone: '+998904567890', visits: 8, spent: 400000, rating: 5, car: 'Gentra', lastVisit: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000), vip: false },
+            { id: 5, name: 'Dilshod Sodiqov', phone: '+998905678901', visits: 6, spent: 300000, rating: 4.7, car: 'Malibu', lastVisit: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000), vip: false }
+        ];
+
+        const mockServices = [
+            { id: 1, name: 'Oddiy yuvish', category: 'exterior', price: 30000, duration: 15, popularity: 45 },
+            { id: 2, name: 'Kompleks yuvish', category: 'exterior', price: 50000, duration: 20, popularity: 35 },
+            { id: 3, name: 'Ichki tozalash', category: 'interior', price: 40000, duration: 30, popularity: 25 },
+            { id: 4, name: 'Premium tozalash', category: 'interior', price: 70000, duration: 40, popularity: 15 },
+            { id: 5, name: 'Polirovka', category: 'detailing', price: 150000, duration: 120, popularity: 8 },
+            { id: 6, name: 'VIP paket', category: 'full', price: 200000, duration: 90, popularity: 12 }
+        ];
+
+        // Initialize
+        function init() {
+            // Setup business
+            state.business = {
+                id: 1,
+                name: 'Premium Auto Wash',
+                phone: '+998712345678',
+                address: 'Toshkent, Yunusobod tumani, Amir Temur 123',
+                registeredAt: new Date(),
+                status: 'active',
+                verified: true,
+                rating: 4.9,
+                totalOrders: 1247
+            };
+
+            // Load data
+            state.queue = mockBookings;
+            state.customers = mockCustomers;
+            state.services = mockServices;
+
+            // Calculate stats
+            updateStats();
+            calculateAnalytics();
+
+            document.getElementById('businessName').textContent = state.business.name;
+
+            showWelcome();
+        }
+
+        function showWelcome() {
+            showMessage('bot', `Assalomu alaykum! 👋\n\n🎯 AutoWash CRM ga xush kelibsiz!\n\nBu - to'liq biznes boshqaruv platformasi:\n• Navbat va CRM\n• Moliya va analytics\n• Mijozlar bazasi\n• Broadcast xabarnomalar\n• Real-time statistika\n\nBoshlash uchun /start bosing.`);
+            showKeyboard([
+                [{ text: '/start', action: 'start', primary: true }]
+            ]);
+        }
+
+        // Message Handling
+        function showMessage(type, text, options = {}) {
+            const container = document.getElementById('chatContainer');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}`;
+
+            const bubble = document.createElement('div');
+            bubble.className = 'message-bubble';
+            bubble.innerHTML = text.replace(/\n/g, '<br>');
+
+            if (options.inline) {
+                const inlineKeyboard = createInlineKeyboard(options.inline);
+                bubble.appendChild(inlineKeyboard);
+            }
+
+            const time = document.createElement('div');
+            time.className = 'message-time';
+            time.textContent = new Date().toLocaleTimeString('uz-UZ', { hour: '2-digit', minute: '2-digit' });
+            bubble.appendChild(time);
+
+            messageDiv.appendChild(bubble);
+            container.appendChild(messageDiv);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function showTyping() {
+            document.getElementById('typingIndicator').style.display = 'block';
+            document.getElementById('chatContainer').scrollTop = document.getElementById('chatContainer').scrollHeight;
+        }
+
+        function hideTyping() {
+            document.getElementById('typingIndicator').style.display = 'none';
+        }
+
+        async function botReply(text, options = {}) {
+            showTyping();
+            await sleep(800);
+            hideTyping();
+            showMessage('bot', text, options);
+        }
+
+        // Keyboard Handling
+        function showKeyboard(buttons) {
+            const keyboard = document.getElementById('keyboard');
+            keyboard.innerHTML = '';
+
+            buttons.forEach(row => {
+                const rowDiv = document.createElement('div');
+                rowDiv.className = 'keyboard-row';
+
+                row.forEach(btn => {
+                    const button = document.createElement('button');
+                    button.className = `keyboard-button ${btn.primary ? 'primary' : ''}`;
+                    button.textContent = btn.text;
+                    button.onclick = () => handleAction(btn.action, btn.data);
+                    if (btn.badge) {
+                        const badge = document.createElement('span');
+                        badge.className = 'notification-badge';
+                        badge.textContent = btn.badge;
+                        button.style.position = 'relative';
+                        button.appendChild(badge);
+                    }
+                    rowDiv.appendChild(button);
+                });
+
+                keyboard.appendChild(rowDiv);
+            });
+        }
+
+        function createInlineKeyboard(buttons) {
+            const container = document.createElement('div');
+            container.className = 'inline-keyboard';
+
+            buttons.forEach(row => {
+                row.forEach(btn => {
+                    const button = document.createElement('div');
+                    button.className = 'inline-button';
+                    button.textContent = btn.text;
+                    button.onclick = () => handleAction(btn.action, btn.data);
+                    container.appendChild(button);
+                });
+            });
+
+            return container;
+        }
+
+        // Action Handlers
+        async function handleAction(action, data) {
+            console.log('Action:', action, data);
+
+            switch(action) {
+                case 'start':
+                    await showMainMenu();
+                    break;
+                case 'crm_dashboard':
+                    await showCRMDashboard();
+                    break;
+                case 'queue':
+                    await showQueue();
+                    break;
+                case 'accept':
+                    await acceptBooking(data);
+                    break;
+                case 'start_wash':
+                    await startWash(data);
+                    break;
+                case 'complete_wash':
+                    await completeWash(data);
+                    break;
+                case 'cancel_wash':
+                    await cancelWash(data);
+                    break;
+                case 'scan':
+                    openScanner();
+                    break;
+                case 'customers':
+                    await showCustomers();
+                    break;
+                case 'customer_analytics':
+                    await showCustomerAnalytics();
+                    break;
+                case 'finance':
+                    await showFinance();
+                    break;
+                case 'analytics':
+                    await showAnalytics();
+                    break;
+                case 'services':
+                    await showServices();
+                    break;
+                case 'broadcast':
+                    openBroadcast();
+                    break;
+                case 'reports':
+                    await showReports();
+                    break;
+                case 'settings':
+                    await showSettings();
+                    break;
+                case 'main_menu':
+                    await showMainMenu();
+                    break;
+            }
+        }
+
+        async function showMainMenu() {
+            showMessage('user', '/start');
+            await botReply('🎯 CRM Asosiy Menyu\n\nKerakli bo\'limni tanlang:');
+
+            const activeQueue = state.queue.filter(b => b.status === 'pending').length;
+
+            showKeyboard([
+                [
+                    { text: '📊 CRM Dashboard', action: 'crm_dashboard', primary: true }
+                ],
+                [
+                    { text: '👥 Navbat', action: 'queue', badge: activeQueue > 0 ? activeQueue : null },
+                    { text: '📷 QR Skaner', action: 'scan' }
+                ],
+                [
+                    { text: '👤 Mijozlar', action: 'customers' },
+                    { text: '📊 Analytics', action: 'analytics' }
+                ],
+                [
+                    { text: '💰 Moliya', action: 'finance' },
+                    { text: '🔧 Xizmatlar', action: 'services' }
+                ],
+                [
+                    { text: '📢 Broadcast', action: 'broadcast' },
+                    { text: '📋 Hisobotlar', action: 'reports' }
+                ],
+                [
+                    { text: '⚙️ Sozlamalar', action: 'settings' }
+                ]
+            ]);
+        }
+
+        async function showCRMDashboard() {
+            showMessage('user', '📊 CRM Dashboard');
+
+            const commission = state.stats.monthRevenue * state.financial.commission;
+            const netRevenue = state.stats.monthRevenue - commission;
+            const growth = '+15.3%';
+
+            const dashboard = `
+                <div class="crm-mega-dashboard">
+                    <div class="dashboard-header">
+                        <div class="dashboard-title">📊 CRM DASHBOARD</div>
+                        <div class="dashboard-time">${new Date().toLocaleTimeString('uz-UZ')}</div>
+                    </div>
+
+                    <div style="background: rgba(255,255,255,0.2); padding: 20px; border-radius: 14px; margin-bottom: 15px; backdrop-filter: blur(10px);">
+                        <div style="font-size: 13px; opacity: 0.9; margin-bottom: 8px;">💰 OYLIK DAROMAD</div>
+                        <div style="font-size: 34px; font-weight: 700; margin-bottom: 8px;">${formatPrice(state.stats.monthRevenue)}</div>
+                        <div style="font-size: 12px; opacity: 0.9;">so'm • ${state.stats.monthBookings} ta buyurtma</div>
+                        <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.3); display: flex; justify-content: space-between; font-size: 13px;">
+                            <span>Komissiya (10%):</span>
+                            <span style="font-weight: 700;">${formatPrice(commission)}</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; font-size: 13px; margin-top: 5px;">
+                            <span>Sizga:</span>
+                            <span style="font-weight: 700;">${formatPrice(netRevenue)}</span>
+                        </div>
+                    </div>
+
+                    <div class="mega-stats-grid">
+                        <div class="mega-stat-card">
+                            <div class="mega-stat-icon">🔴</div>
+                            <div class="mega-stat-value">${state.stats.activeQueue}</div>
+                            <div class="mega-stat-label">Navbatda</div>
+                        </div>
+                        <div class="mega-stat-card">
+                            <div class="mega-stat-icon">🚿</div>
+                            <div class="mega-stat-value">${state.stats.washing}</div>
+                            <div class="mega-stat-label">Yuvish jarayonida</div>
+                        </div>
+                        <div class="mega-stat-card">
+                            <div class="mega-stat-icon">👥</div>
+                            <div class="mega-stat-value">${state.stats.totalCustomers}</div>
+                            <div class="mega-stat-label">Jami mijozlar</div>
+                        </div>
+                        <div class="mega-stat-card">
+                            <div class="mega-stat-icon">⭐</div>
+                            <div class="mega-stat-value">${state.stats.avgRating}</div>
+                            <div class="mega-stat-label">Reyting</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="analytics-grid">
+                    <div class="analytics-box">
+                        <div class="analytics-icon">📅</div>
+                        <div class="analytics-value">${state.stats.todayBookings}</div>
+                        <div class="analytics-label">Bugun</div>
+                    </div>
+                    <div class="analytics-box">
+                        <div class="analytics-icon">💵</div>
+                        <div class="analytics-value">${formatPrice(state.stats.todayRevenue)}</div>
+                        <div class="analytics-label">Bugun daromad</div>
+                    </div>
+                    <div class="analytics-box">
+                        <div class="analytics-icon">💎</div>
+                        <div class="analytics-value">${state.stats.vipCustomers}</div>
+                        <div class="analytics-label">VIP mijozlar</div>
+                    </div>
+                    <div class="analytics-box">
+                        <div class="analytics-icon">💰</div>
+                        <div class="analytics-value">${formatPrice(state.stats.avgCheck)}</div>
+                        <div class="analytics-label">O'rtacha check</div>
+                    </div>
+                </div>
+
+                <div class="alert-box alert-success">
+                    📈 Biznes o'sishi: <strong>${growth}</strong> o'tgan oyga nisbatan
+                </div>
+            `;
+
+            showMessage('bot', dashboard, {
+                inline: [
+                    [
+                        { text: '🔄 Yangilash', action: 'crm_dashboard' },
+                        { text: '📊 Batafsil', action: 'analytics' }
+                    ]
+                ]
+            });
+        }
+
+        async function showQueue() {
+            showMessage('user', '👥 Navbat');
+
+            const pending = state.queue.filter(b => b.status === 'pending' || b.status === 'washing');
+
+            if (pending.length === 0) {
+                await botReply('📋 Navbat bo\'sh\n\nHozirda buyurtmalar yo\'q.');
+                return;
+            }
+
+            await botReply(`👥 Navbat: ${pending.length} ta mijoz`);
+
+            pending.forEach(booking => {
+                const statusEmoji = {
+                    'pending': '⏳',
+                    'washing': '🚿'
+                };
+
+                const statusText = {
+                    'pending': 'Kutmoqda',
+                    'washing': 'Yuvish'
+                };
+
+                const card = `
+                    <div class="queue-card">
+                        <div class="queue-header">
+                            <div class="queue-number">${statusEmoji[booking.status]} #${booking.position || '---'}</div>
+                            <span class="queue-status status-${booking.status}">${statusText[booking.status]}</span>
+                        </div>
+                        <div class="queue-details">
+                            <div><strong>🎫 ${booking.number}</strong></div>
+                            <div>👤 ${booking.customer.name}</div>
+                            <div>📞 ${booking.customer.phone}</div>
+                            <div>🚗 ${booking.customer.car} (${booking.customer.carNumber})</div>
+                            <div>🚿 ${booking.service}</div>
+                            <div>💰 ${formatPrice(booking.price)} so'm</div>
+                            <div>⏰ ${new Date(booking.createdAt).toLocaleTimeString('uz-UZ')}</div>
+                        </div>
+                        <div class="queue-actions" id="actions-${booking.id}"></div>
+                    </div>
+                `;
+
+                showMessage('bot', card);
+
+                setTimeout(() => {
+                    const actionsDiv = document.getElementById(`actions-${booking.id}`);
+                    if (actionsDiv) {
+                        if (booking.status === 'pending') {
+                            actionsDiv.innerHTML = `
+                                <button class="action-btn btn-accept" onclick="handleAction('accept', ${booking.id})">✅ Qabul</button>
+                                <button class="action-btn btn-start" onclick="handleAction('start_wash', ${booking.id})">🚿 Boshlash</button>
+                                <button class="action-btn btn-cancel" onclick="handleAction('cancel_wash', ${booking.id})">❌ Bekor</button>
+                            `;
+                        } else if (booking.status === 'washing') {
+                            actionsDiv.innerHTML = `
+                                <button class="action-btn btn-complete" onclick="handleAction('complete_wash', ${booking.id})">✔️ Tayyor</button>
+                                <button class="action-btn btn-cancel" onclick="handleAction('cancel_wash', ${booking.id})">❌ Bekor</button>
+                            `;
+                        }
+                    }
+                }, 100);
+            });
+        }
+
+        async function acceptBooking(bookingId) {
+            const booking = state.queue.find(b => b.id === bookingId);
+            booking.status = 'confirmed';
+            
+            await botReply(`✅ Qabul qilindi!\n\n🎫 ${booking.number}\n👤 ${booking.customer.name}\n\nMijozga SMS va Telegram xabar yuborildi.`);
+            
+            updateStats();
+        }
+
+        async function startWash(bookingId) {
+            const booking = state.queue.find(b => b.id === bookingId);
+            booking.status = 'washing';
+            booking.startedAt = new Date();
+            
+            await botReply(`🚿 Yuvish boshlandi!\n\n🎫 ${booking.number}\n👤 ${booking.customer.name}\n⏱️ ${new Date().toLocaleTimeString('uz-UZ')}\n\nMijozga xabar yuborildi.`);
+            
+            updateStats();
+        }
+
+        async function completeWash(bookingId) {
+            const booking = state.queue.find(b => b.id === bookingId);
+            booking.status = 'completed';
+            booking.completedAt = new Date();
+            
+            await botReply(
+                `✅ Bajarildi!\n\n` +
+                `🎫 ${booking.number}\n` +
+                `👤 ${booking.customer.name}\n` +
+                `💰 ${formatPrice(booking.price)} so'm\n` +
+                `⏱️ Davomiyligi: ${Math.floor((booking.completedAt - booking.startedAt) / 60000)} daqiqa\n\n` +
+                `Mijozga to'lov va reyting so'rovi yuborildi.`
+            );
+
+            // Update stats
+            state.stats.todayBookings++;
+            state.stats.todayRevenue += booking.price;
+            state.stats.monthBookings++;
+            state.stats.monthRevenue += booking.price;
+            
+            updateStats();
+            calculateAnalytics();
+
+            // Remove from queue
+            setTimeout(() => {
+                const index = state.queue.findIndex(b => b.id === bookingId);
+                if (index > -1) {
+                    state.queue.splice(index, 1);
+                    updateStats();
+                }
+            }, 3000);
+        }
+
+        async function cancelWash(bookingId) {
+            const booking = state.queue.find(b => b.id === bookingId);
+            
+            await botReply(`❌ Bekor qilindi\n\n🎫 ${booking.number}\n👤 ${booking.customer.name}\n\nMijozga xabar yuborildi.`);
+            
+            const index = state.queue.findIndex(b => b.id === bookingId);
+            if (index > -1) {
+                state.queue.splice(index, 1);
+            }
+            
+            updateStats();
+        }
+
+        function openScanner() {
+            showMessage('user', '📷 QR Skaner');
+            document.getElementById('scannerModal').style.display = 'flex';
+            document.getElementById('scannerInput').focus();
+        }
+
+        function closeScanner() {
+            document.getElementById('scannerModal').style.display = 'none';
+            document.getElementById('scannerInput').value = '';
+        }
+
+        function processQRScan() {
+            const input = document.getElementById('scannerInput').value.trim();
+            const bookingNumber = input.replace('#', '');
+            
+            const booking = state.queue.find(b => b.number === bookingNumber);
+            
+            closeScanner();
+            
+            if (booking) {
+                const card = `
+                    <div class="queue-card">
+                        <div style="text-align: center; margin-bottom: 15px;">
+                            <div style="font-size: 48px; margin-bottom: 10px;">✅</div>
+                            <div style="font-size: 20px; font-weight: 700; color: #28a745;">Topildi!</div>
+                        </div>
+                        <div class="queue-details">
+                            <div><strong>🎫 ${booking.number}</strong></div>
+                            <div>👤 ${booking.customer.name}</div>
+                            <div>📞 ${booking.customer.phone}</div>
+                            <div>🚗 ${booking.customer.car}</div>
+                            <div>🔢 ${booking.customer.carNumber}</div>
+                            <div>🚿 ${booking.service}</div>
+                            <div>💰 ${formatPrice(booking.price)} so'm</div>
+                        </div>
+                    </div>
+                `;
+
+                showMessage('bot', card, {
+                    inline: booking.status === 'pending' ? [
+                        [{ text: '🚿 Yuvishni boshlash', action: 'start_wash', data: booking.id }]
+                    ] : booking.status === 'washing' ? [
+                        [{ text: '✔️ Tayyor', action: 'complete_wash', data: booking.id }]
+                    ] : []
+                });
+            } else {
+                showMessage('bot', '❌ Buyurtma topilmadi\n\nRaqamni tekshiring.');
+            }
+        }
+
+        async function showCustomers() {
+            showMessage('user', '👤 Mijozlar');
+
+            await botReply(`👥 Mijozlar bazasi: ${state.stats.totalCustomers} ta\n\n🏆 TOP mijozlar:`);
+
+            const topCustomers = [...state.customers].sort((a, b) => b.spent - a.spent).slice(0, 5);
+
+            topCustomers.forEach((customer, index) => {
+                const medals = ['🥇', '🥈', '🥉', '4️⃣', '5️⃣'];
+                const medal = medals[index];
+                const daysAgo = Math.floor((Date.now() - customer.lastVisit) / (1000 * 60 * 60 * 24));
+
+                const card = `
+                    <div class="customer-card">
+                        <div class="customer-header">
+                            <div>
+                                <div style="font-size: 24px; margin-bottom: 4px;">${medal}</div>
+                                <div class="customer-name">${customer.name}</div>
+                            </div>
+                            ${customer.vip ? '<div class="customer-badge">VIP</div>' : ''}
+                        </div>
+                        <div class="customer-stats">
+                            <div>📞 ${customer.phone}</div>
+                            <div>🚗 ${customer.car}</div>
+                            <div>✅ Tashrif: ${customer.visits} marta</div>
+                            <div>💰 Sarflagan: ${formatPrice(customer.spent)} so'm</div>
+                            <div>⭐ Reyting: ${customer.rating}/5</div>
+                            <div>🕐 Oxirgi: ${daysAgo} kun oldin</div>
+                        </div>
+                    </div>
+                `;
+
+                showMessage('bot', card);
+            });
+
+            showMessage('bot', 
+                `<div class="alert-box alert-info">` +
+                `💎 VIP mijozlar: ${state.stats.vipCustomers}<br>` +
+                `📊 O'rtacha check: ${formatPrice(state.stats.avgCheck)} so'm<br>` +
+                `🔄 Qaytish darajasi: ${state.analytics.customerRetention}%` +
+                `</div>`
+            );
+        }
+
+        async function showFinance() {
+            showMessage('user', '💰 Moliya');
+
+            const commission = state.stats.monthRevenue * state.financial.commission;
+            const netRevenue = state.stats.monthRevenue - commission;
+            const todayCommission = state.stats.todayRevenue * state.financial.commission;
+            const todayNet = state.stats.todayRevenue - todayCommission;
+
+            const finance = `
+                <div class="revenue-mega-card">
+                    <div class="revenue-label">💰 OYLIK DAROMAD</div>
+                    <div class="revenue-amount">${formatPrice(state.stats.monthRevenue)} so'm</div>
+                    <div class="revenue-details">
+                        <div>📦 Buyurtmalar: ${state.stats.monthBookings} ta</div>
+                        <div>💳 AutoWash komissiya (10%): ${formatPrice(commission)} so'm</div>
+                        <div style="font-weight: 700; font-size: 16px; padding-top: 10px; border-top: 2px solid rgba(0,0,0,0.1);">
+                            ✅ Sizga: ${formatPrice(netRevenue)} so'm
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chart-card">
+                    <div class="chart-title">📅 Bugungi moliya</div>
+                    <div style="text-align: center; margin: 20px 0;">
+                        <div style="font-size: 32px; font-weight: 700; color: #1e3c72; margin-bottom: 10px;">
+                            ${formatPrice(state.stats.todayRevenue)} so'm
+                        </div>
+                        <div style="color: #666; font-size: 14px; margin-bottom: 15px;">${state.stats.todayBookings} buyurtma</div>
+                        <div style="padding: 15px; background: #f8f9fa; border-radius: 10px; display: flex; justify-content: space-between;">
+                            <span style="color: #666;">Sizga:</span>
+                            <span style="font-weight: 700; color: #28a745;">${formatPrice(todayNet)} so'm</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="analytics-grid">
+                    <div class="analytics-box">
+                        <div class="analytics-icon">📊</div>
+                        <div class="analytics-value">${formatPrice(state.stats.avgCheck)}</div>
+                        <div class="analytics-label">O'rtacha check</div>
+                    </div>
+                    <div class="analytics-box">
+                        <div class="analytics-icon">💵</div>
+                        <div class="analytics-value">${formatPrice(state.stats.monthRevenue / 30)}</div>
+                        <div class="analytics-label">Kunlik o'rtacha</div>
+                    </div>
+                </div>
+
+                <div class="alert-box alert-info">
+                    💡 To'lov har oyning 5-kunida hisobingizga o'tkaziladi
+                </div>
+            `;
+
+            showMessage('bot', finance);
+        }
+
+        async function showAnalytics() {
+            showMessage('user', '📊 Analytics');
+
+            const analytics = `
+                <div class="chart-card">
+                    <div class="chart-title">📊 Haftalik Statistika</div>
+                    <div class="chart-container">
+                        <canvas id="weeklyChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="chart-card">
+                    <div class="chart-title">📈 Oylik Dinamika</div>
+                    <div class="chart-container">
+                        <canvas id="monthlyChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="analytics-grid">
+                    <div class="analytics-box">
+                        <div class="analytics-icon">🔄</div>
+                        <div class="analytics-value">${state.analytics.customerRetention}%</div>
+                        <div class="analytics-label">Qaytish darajasi</div>
+                    </div>
+                    <div class="analytics-box">
+                        <div class="analytics-icon">📈</div>
+                        <div class="analytics-value">+${state.analytics.growthRate}%</div>
+                        <div class="analytics-label">O'sish</div>
+                    </div>
+                </div>
+            `;
+
+            showMessage('bot', analytics);
+
+            setTimeout(() => {
+                // Weekly chart
+                const weeklyCtx = document.getElementById('weeklyChart');
+                if (weeklyCtx) {
+                    new Chart(weeklyCtx, {
+                        type: 'bar',
+                        data: {
+                            labels: ['Dush', 'Sesh', 'Chor', 'Pay', 'Juma', 'Shan', 'Yak'],
+                            datasets: [{
+                                label: 'Buyurtmalar',
+                                data: [32, 45, 38, 52, 68, 95, 82],
+                                backgroundColor: 'rgba(30, 60, 114, 0.7)',
+                                borderColor: '#1e3c72',
+                                borderWidth: 2
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: { legend: { display: false } }
+                        }
+                    });
+                }
+
+                // Monthly chart
+                const monthlyCtx = document.getElementById('monthlyChart');
+                if (monthlyCtx) {
+                    new Chart(monthlyCtx, {
+                        type: 'line',
+                        data: {
+                            labels: Array.from({length: 30}, (_, i) => i + 1),
+                            datasets: [{
+                                label: 'Daromad',
+                                data: Array.from({length: 30}, () => Math.floor(Math.random() * 500000) + 1000000),
+                                borderColor: '#8B0000',
+                                backgroundColor: 'rgba(139, 0, 0, 0.1)',
+                                tension: 0.4,
+                                fill: true
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: { legend: { display: false } }
+                        }
+                    });
+                }
+            }, 100);
+        }
+
+        async function showServices() {
+            showMessage('user', '🔧 Xizmatlar');
+
+            await botReply('🔧 Xizmatlar ro\'yxati:');
+
+            // Group by category
+            const categories = {
+                exterior: { emoji: '🚿', name: 'TASHQI YUVISH', services: [] },
+                interior: { emoji: '🧽', name: 'ICHKI TOZALASH', services: [] },
+                detailing: { emoji: '✨', name: 'DETAILING', services: [] },
+                full: { emoji: '💎', name: 'TO\'LIQ PAKET', services: [] }
+            };
+
+            state.services.forEach(service => {
+                if (categories[service.category]) {
+                    categories[service.category].services.push(service);
+                }
+            });
+
+            Object.values(categories).forEach(cat => {
+                if (cat.services.length > 0) {
+                    showMessage('bot', `<div style="font-weight: 700; font-size: 16px; margin: 15px 0; color: #1e3c72;">${cat.emoji} ${cat.name}</div>`);
+
+                    cat.services.forEach(service => {
+                        const card = `
+                            <div class="service-card">
+                                <div class="service-header">
+                                    <div class="service-name">${service.name}</div>
+                                    <div class="service-price">${formatPrice(service.price)}</div>
+                                </div>
+                                <div class="service-meta">
+                                    <span>⏱️ ${service.duration} daqiqa</span>
+                                    <span>📊 Populyarlik: ${service.popularity}%</span>
+                                </div>
+                            </div>
+                        `;
+                        showMessage('bot', card);
+                    });
+                }
+            });
+        }
+
+        function openBroadcast() {
+            showMessage('user', '📢 Broadcast');
+            document.getElementById('broadcastModal').style.display = 'flex';
+            document.getElementById('broadcastMessage').focus();
+        }
+
+        function closeBroadcast() {
+            document.getElementById('broadcastModal').style.display = 'none';
+            document.getElementById('broadcastMessage').value = '';
+        }
+
+        async function sendBroadcast() {
+            const message = document.getElementById('broadcastMessage').value.trim();
+            const target = document.getElementById('broadcastTarget').value;
+
+            if (!message) {
+                alert('Xabar matnini kiriting!');
+                return;
+            }
+
+            closeBroadcast();
+
+            await botReply('📤 Yuborilmoqda...');
+            await sleep(2000);
+
+            const targetCounts = {
+                'all': state.stats.totalCustomers,
+                'vip': state.stats.vipCustomers,
+                'active': Math.floor(state.stats.totalCustomers * 0.7),
+                'inactive': Math.floor(state.stats.totalCustomers * 0.15)
+            };
+
+            const targetNames = {
+                'all': 'Barcha mijozlar',
+                'vip': 'VIP mijozlar',
+                'active': 'Faol mijozlar',
+                'inactive': 'Nofaol mijozlar'
+            };
+
+            const sent = targetCounts[target];
+
+            await botReply(
+                `✅ Xabar yuborildi!\n\n` +
+                `🎯 Maqsad: ${targetNames[target]}\n` +
+                `📤 Yuborildi: ${sent}\n` +
+                `💬 Matn: "${message.substring(0, 50)}${message.length > 50 ? '...' : ''}"`
+            );
+        }
+
+        async function showReports() {
+            showMessage('user', '📋 Hisobotlar');
+
+            const reports = `
+                <div class="chart-card">
+                    <div class="chart-title">📊 Xizmatlar Populyarligi</div>
+                    <div class="chart-container">
+                        <canvas id="servicesChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="alert-box alert-success">
+                    ✅ Hisobotlar har kuni avtomatik generatsiya qilinadi va email'ga yuboriladi
+                </div>
+            `;
+
+            showMessage('bot', reports);
+
+            setTimeout(() => {
+                const ctx = document.getElementById('servicesChart');
+                if (ctx) {
+                    new Chart(ctx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: state.services.map(s => s.name),
+                            datasets: [{
+                                data: state.services.map(s => s.popularity),
+                                backgroundColor: [
+                                    '#1e3c72', '#8B0000', '#FFD700',
+                                    '#28a745', '#17a2b8', '#dc3545'
+                                ]
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { position: 'bottom' }
+                            }
+                        }
+                    });
+                }
+            }, 100);
+        }
+
+        async function showSettings() {
+            showMessage('user', '⚙️ Sozlamalar');
+
+            const settings = `
+                <div class="settings-card">
+                    <div class="settings-item">
+                        <div class="settings-label">🏢 Biznes nomi</div>
+                        <div class="settings-value">${state.business.name}</div>
+                    </div>
+                    <div class="settings-item">
+                        <div class="settings-label">📞 Telefon</div>
+                        <div class="settings-value">${state.business.phone}</div>
+                    </div>
+                    <div class="settings-item">
+                        <div class="settings-label">📍 Manzil</div>
+                        <div class="settings-value">${state.business.address}</div>
+                    </div>
+                    <div class="settings-item">
+                        <div class="settings-label">⏰ Ish vaqti</div>
+                        <div class="settings-value">09:00 - 21:00</div>
+                    </div>
+                    <div class="settings-item">
+                        <div class="settings-label">💳 Komissiya</div>
+                        <div class="settings-value">${state.financial.commission * 100}%</div>
+                    </div>
+                    <div class="settings-item">
+                        <div class="settings-label">⭐ Reyting</div>
+                        <div class="settings-value">${state.business.rating}/5.0 (${state.business.totalOrders} sharh)</div>
+                    </div>
+                </div>
+            `;
+
+            showMessage('bot', settings);
+        }
+
+        // Utility Functions
+        function updateStats() {
+            state.stats.activeQueue = state.queue.filter(b => b.status === 'pending').length;
+            state.stats.washing = state.queue.filter(b => b.status === 'washing').length;
+            state.stats.totalCustomers = state.customers.length;
+            state.stats.vipCustomers = state.customers.filter(c => c.vip).length;
+            state.stats.avgRating = 4.9;
+            
+            const totalSpent = state.customers.reduce((sum, c) => sum + c.spent, 0);
+            const totalVisits = state.customers.reduce((sum, c) => sum + c.visits, 0);
+            state.stats.avgCheck = totalVisits > 0 ? Math.floor(totalSpent / totalVisits) : 0;
+        }
+
+        function calculateAnalytics() {
+            state.analytics.customerRetention = 87;
+            state.analytics.growthRate = 15.3;
+        }
+
+        function formatPrice(price) {
+            return Math.round(price).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+        }
+
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        // Initialize
+        window.onload = init;
+    </script>
+</body>
+</html>
