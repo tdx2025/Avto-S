@@ -1,0 +1,1620 @@
+
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AutoWash Admin Bot - Super Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            background: linear-gradient(135deg, #8B0000 0%, #DC143C 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .phone-container {
+            width: 100%;
+            max-width: 450px;
+            height: 900px;
+            background: #ffffff;
+            border-radius: 40px;
+            box-shadow: 0 30px 100px rgba(0,0,0,0.5);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .phone-notch {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 150px;
+            height: 32px;
+            background: #000;
+            border-radius: 0 0 22px 22px;
+            z-index: 100;
+        }
+
+        .phone-header {
+            background: linear-gradient(135deg, #8B0000 0%, #DC143C 100%);
+            padding: 55px 20px 25px;
+            color: white;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        }
+
+        .bot-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 6px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .bot-subtitle {
+            font-size: 14px;
+            opacity: 0.95;
+            font-weight: 500;
+        }
+
+        .admin-badge {
+            display: inline-block;
+            background: rgba(255,255,255,0.25);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            margin-top: 12px;
+            font-weight: 700;
+            border: 2px solid rgba(255,255,255,0.3);
+        }
+
+        .chat-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background: linear-gradient(to bottom, #f8f9fa 0%, #e9ecef 100%);
+        }
+
+        .message {
+            margin-bottom: 16px;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message.bot {
+            display: flex;
+            justify-content: flex-start;
+        }
+
+        .message.user {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .message-bubble {
+            max-width: 90%;
+            padding: 16px 20px;
+            border-radius: 20px;
+            word-wrap: break-word;
+            position: relative;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.1);
+        }
+
+        .message.bot .message-bubble {
+            background: white;
+            border-bottom-left-radius: 4px;
+        }
+
+        .message.user .message-bubble {
+            background: linear-gradient(135deg, #8B0000 0%, #DC143C 100%);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .message-time {
+            font-size: 11px;
+            color: #999;
+            margin-top: 8px;
+            text-align: right;
+        }
+
+        .message.user .message-time {
+            color: rgba(255,255,255,0.85);
+        }
+
+        .super-dashboard {
+            background: linear-gradient(135deg, #8B0000 0%, #DC143C 100%);
+            color: white;
+            border-radius: 18px;
+            padding: 25px;
+            margin: 15px 0;
+            box-shadow: 0 8px 30px rgba(139,0,0,0.4);
+        }
+
+        .dashboard-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .dashboard-time {
+            font-size: 12px;
+            opacity: 0.9;
+            margin-bottom: 20px;
+        }
+
+        .mega-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .mega-stat {
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(10px);
+            padding: 18px;
+            border-radius: 14px;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .mega-stat-icon {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .mega-stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .mega-stat-label {
+            font-size: 12px;
+            opacity: 0.9;
+            font-weight: 600;
+        }
+
+        .pending-card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            margin: 12px 0;
+            border-left: 5px solid #ffc107;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+            position: relative;
+        }
+
+        .pending-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .pending-name {
+            font-size: 18px;
+            font-weight: 700;
+            color: #8B0000;
+        }
+
+        .pending-badge {
+            background: #fff3cd;
+            color: #856404;
+            padding: 6px 14px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .pending-details {
+            font-size: 13px;
+            line-height: 2;
+            color: #333;
+        }
+
+        .pending-details div {
+            margin-bottom: 6px;
+        }
+
+        .approval-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .action-btn {
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+
+        .btn-approve {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(40,167,69,0.3);
+        }
+
+        .btn-reject {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(220,53,69,0.3);
+        }
+
+        .action-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+        }
+
+        .user-card {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 14px;
+            padding: 18px;
+            margin: 10px 0;
+            border-left: 4px solid #8B0000;
+        }
+
+        .user-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .user-name {
+            font-size: 17px;
+            font-weight: 700;
+            color: #8B0000;
+        }
+
+        .user-type {
+            background: #8B0000;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .user-stats {
+            font-size: 13px;
+            line-height: 1.9;
+            color: #555;
+        }
+
+        .revenue-mega-card {
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+            color: #000;
+            border-radius: 20px;
+            padding: 30px;
+            margin: 15px 0;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(255,215,0,0.4);
+        }
+
+        .revenue-label {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            opacity: 0.8;
+        }
+
+        .revenue-amount {
+            font-size: 42px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .revenue-breakdown {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 2px solid rgba(0,0,0,0.1);
+            font-size: 14px;
+            line-height: 1.8;
+        }
+
+        .chart-card {
+            background: white;
+            border-radius: 16px;
+            padding: 25px;
+            margin: 15px 0;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+
+        .chart-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #8B0000;
+            margin-bottom: 20px;
+        }
+
+        .chart-container {
+            width: 100%;
+            height: 250px;
+        }
+
+        .broadcast-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 16px;
+            padding: 25px;
+            margin: 15px 0;
+            box-shadow: 0 8px 30px rgba(102,126,234,0.4);
+        }
+
+        .broadcast-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .broadcast-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 12px;
+            font-size: 15px;
+            margin-bottom: 15px;
+            background: rgba(255,255,255,0.15);
+            color: white;
+            backdrop-filter: blur(10px);
+        }
+
+        .broadcast-input::placeholder {
+            color: rgba(255,255,255,0.7);
+        }
+
+        .broadcast-target {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .target-option {
+            padding: 12px;
+            background: rgba(255,255,255,0.2);
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .target-option:hover, .target-option.active {
+            background: rgba(255,255,255,0.3);
+            border-color: white;
+            transform: scale(1.05);
+        }
+
+        .keyboard {
+            background: white;
+            padding: 14px;
+            border-top: 2px solid #e0e0e0;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.08);
+        }
+
+        .keyboard-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .keyboard-button {
+            flex: 1;
+            padding: 16px;
+            background: white;
+            border: 2px solid #8B0000;
+            color: #8B0000;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+            position: relative;
+        }
+
+        .keyboard-button:hover {
+            background: #8B0000;
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 16px rgba(139,0,0,0.3);
+        }
+
+        .keyboard-button.primary {
+            background: linear-gradient(135deg, #8B0000 0%, #DC143C 100%);
+            color: white;
+            border: none;
+        }
+
+        .keyboard-button.primary:hover {
+            background: linear-gradient(135deg, #DC143C 0%, #8B0000 100%);
+        }
+
+        .inline-keyboard {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .inline-button {
+            padding: 14px 20px;
+            background: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 14px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .inline-button:hover {
+            background: #e9ecef;
+            border-color: #8B0000;
+            transform: translateX(6px);
+        }
+
+        .typing-indicator {
+            display: none;
+            padding: 14px 20px;
+            background: white;
+            border-radius: 20px;
+            width: fit-content;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.1);
+        }
+
+        .typing-indicator span {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            background: #8B0000;
+            border-radius: 50%;
+            margin: 0 3px;
+            animation: typing 1.4s infinite;
+        }
+
+        .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes typing {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-12px); }
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background: #dc3545;
+            color: white;
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+            box-shadow: 0 2px 8px rgba(220,53,69,0.4);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .alert-box {
+            padding: 14px 18px;
+            border-radius: 12px;
+            margin: 12px 0;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .alert-success {
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            color: #155724;
+            border-left: 5px solid #28a745;
+        }
+
+        .alert-info {
+            background: linear-gradient(135deg, #d1ecf1 0%, #bee5eb 100%);
+            color: #0c5460;
+            border-left: 5px solid #17a2b8;
+        }
+
+        .alert-warning {
+            background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+            color: #856404;
+            border-left: 5px solid #ffc107;
+        }
+
+        .alert-danger {
+            background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+            color: #721c24;
+            border-left: 5px solid #dc3545;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin: 15px 0;
+        }
+
+        .stat-box {
+            background: white;
+            padding: 20px;
+            border-radius: 14px;
+            text-align: center;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+            border-top: 4px solid #8B0000;
+        }
+
+        .stat-icon {
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+
+        .stat-value {
+            font-size: 26px;
+            font-weight: 700;
+            color: #8B0000;
+            margin-bottom: 6px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #666;
+            font-weight: 600;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.85);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-container {
+            background: white;
+            padding: 35px;
+            border-radius: 24px;
+            max-width: 90%;
+            max-height: 80%;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .modal-title {
+            font-size: 26px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #8B0000;
+            text-align: center;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 25px;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 16px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 15px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #8B0000 0%, #DC143C 100%);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .hidden { display: none !important; }
+
+        .progress-ring {
+            width: 120px;
+            height: 120px;
+            margin: 20px auto;
+        }
+
+        .growth-indicator {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            margin-left: 8px;
+        }
+
+        .growth-up {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .growth-down {
+            background: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <div class="phone-container">
+        <div class="phone-notch"></div>
+        <div class="phone-header">
+            <div class="bot-title">👑 AutoWash Admin</div>
+            <div class="bot-subtitle">Super Dashboard</div>
+            <div class="admin-badge">SUPER ADMIN</div>
+        </div>
+
+        <div class="chat-container" id="chatContainer">
+            <!-- Messages will be added here -->
+        </div>
+
+        <div class="typing-indicator" id="typingIndicator">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+
+        <div class="keyboard" id="keyboard">
+            <!-- Keyboard will be added here dynamically -->
+        </div>
+    </div>
+
+    <!-- Rejection Modal -->
+    <div class="modal-overlay" id="rejectionModal">
+        <div class="modal-container">
+            <div class="modal-title">❌ Rad etish sababi</div>
+            <textarea id="rejectionReason" style="width: 100%; height: 120px; padding: 15px; border: 2px solid #ddd; border-radius: 12px; font-size: 14px; font-family: inherit;" placeholder="Sabab kiriting..."></textarea>
+            <div class="modal-buttons">
+                <button class="modal-btn btn-primary" onclick="submitRejection()">Yuborish</button>
+                <button class="modal-btn btn-secondary" onclick="closeRejectionModal()">Bekor qilish</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Broadcast Modal -->
+    <div class="modal-overlay" id="broadcastModal">
+        <div class="modal-container">
+            <div class="modal-title">📢 Ommaviy Xabar</div>
+            <textarea id="broadcastMessage" style="width: 100%; height: 150px; padding: 15px; border: 2px solid #ddd; border-radius: 12px; font-size: 14px; font-family: inherit; margin-bottom: 15px;" placeholder="Xabar matnini kiriting..."></textarea>
+            
+            <div style="margin-bottom: 15px;">
+                <label style="font-weight: 600; margin-bottom: 8px; display: block;">Kimga yubormoqchisiz?</label>
+                <div class="broadcast-target">
+                    <div class="target-option" data-target="all_users">👥 Barcha foydalanuvchilar</div>
+                    <div class="target-option" data-target="all_business">🏢 Barcha bizneslar</div>
+                    <div class="target-option" data-target="active_users">🎯 Faol foydalanuvchilar</div>
+                    <div class="target-option" data-target="new_users">🆕 Yangi foydalanuvchilar</div>
+                </div>
+            </div>
+
+            <div class="modal-buttons">
+                <button class="modal-btn btn-primary" onclick="sendBroadcast()">📤 Yuborish</button>
+                <button class="modal-btn btn-secondary" onclick="closeBroadcastModal()">Bekor qilish</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // State Management
+        const state = {
+            admin: {
+                id: 1,
+                name: 'Super Admin',
+                role: 'super_admin'
+            },
+            platform: {
+                totalUsers: 15234,
+                activeBusinesses: 127,
+                pendingBusinesses: 5,
+                activeBookings: 23,
+                todayBookings: 89,
+                todayRevenue: 44500000,
+                monthBookings: 2847,
+                monthRevenue: 1423500000
+            },
+            pendingBusinesses: [],
+            users: [],
+            businesses: [],
+            selectedTarget: null,
+            rejectionContext: null
+        };
+
+        // Mock Data
+        const mockPendingBusinesses = [
+            {
+                id: 1,
+                name: 'Crystal Clear Wash',
+                owner: 'Jamshid Karimov',
+                phone: '+998901234567',
+                address: 'Toshkent, Chilonzor tumani',
+                telegram: '@jamshid_k',
+                submittedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000)
+            },
+            {
+                id: 2,
+                name: 'Shine Auto Service',
+                owner: 'Sardor Alimov',
+                phone: '+998902345678',
+                address: 'Samarqand, Registon ko\'chasi',
+                telegram: '@sardor_auto',
+                submittedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000)
+            },
+            {
+                id: 3,
+                name: 'Express Wash 24/7',
+                owner: 'Bobur Tursunov',
+                phone: '+998903456789',
+                address: 'Toshkent, Yunusobod tumani',
+                telegram: '@bobur_wash',
+                submittedAt: new Date(Date.now() - 5 * 60 * 60 * 1000)
+            }
+        ];
+
+        const mockUsers = [
+            { id: 1, name: 'Aziz Rahimov', phone: '+998904567890', type: 'driver', registeredAt: new Date(), totalOrders: 15, totalSpent: 750000 },
+            { id: 2, name: 'Dilshod Sodiqov', phone: '+998905678901', type: 'driver', registeredAt: new Date(), totalOrders: 8, totalSpent: 400000 },
+            { id: 3, name: 'Premium Auto Wash', phone: '+998906789012', type: 'business', registeredAt: new Date(), totalOrders: 234, totalRevenue: 11700000 }
+        ];
+
+        // Initialize
+        function init() {
+            state.pendingBusinesses = mockPendingBusinesses;
+            state.users = mockUsers;
+            state.platform.pendingBusinesses = mockPendingBusinesses.length;
+
+            showMessage('bot', 'Assalomu alaykum, Super Admin! 👑\n\nAutoWash platformasi boshqaruv paneliga xush kelibsiz.\n\nBoshlash uchun /start bosing.');
+            showKeyboard([
+                [{ text: '/start', action: 'start', primary: true }]
+            ]);
+
+            // Setup broadcast target selection
+            document.querySelectorAll('.target-option').forEach(opt => {
+                opt.addEventListener('click', function() {
+                    document.querySelectorAll('.target-option').forEach(o => o.classList.remove('active'));
+                    this.classList.add('active');
+                    state.selectedTarget = this.dataset.target;
+                });
+            });
+        }
+
+        // Message Handling
+        function showMessage(type, text, options = {}) {
+            const container = document.getElementById('chatContainer');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}`;
+
+            const bubble = document.createElement('div');
+            bubble.className = 'message-bubble';
+            bubble.innerHTML = text.replace(/\n/g, '<br>');
+
+            if (options.inline) {
+                const inlineKeyboard = createInlineKeyboard(options.inline);
+                bubble.appendChild(inlineKeyboard);
+            }
+
+            const time = document.createElement('div');
+            time.className = 'message-time';
+            time.textContent = new Date().toLocaleTimeString('uz-UZ', { hour: '2-digit', minute: '2-digit' });
+            bubble.appendChild(time);
+
+            messageDiv.appendChild(bubble);
+            container.appendChild(messageDiv);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function showTyping() {
+            document.getElementById('typingIndicator').style.display = 'block';
+            document.getElementById('chatContainer').scrollTop = document.getElementById('chatContainer').scrollHeight;
+        }
+
+        function hideTyping() {
+            document.getElementById('typingIndicator').style.display = 'none';
+        }
+
+        async function botReply(text, options = {}) {
+            showTyping();
+            await sleep(1000);
+            hideTyping();
+            showMessage('bot', text, options);
+        }
+
+        // Keyboard Handling
+        function showKeyboard(buttons) {
+            const keyboard = document.getElementById('keyboard');
+            keyboard.innerHTML = '';
+
+            buttons.forEach(row => {
+                const rowDiv = document.createElement('div');
+                rowDiv.className = 'keyboard-row';
+
+                row.forEach(btn => {
+                    const button = document.createElement('button');
+                    button.className = `keyboard-button ${btn.primary ? 'primary' : ''}`;
+                    button.textContent = btn.text;
+                    button.onclick = () => handleAction(btn.action, btn.data);
+                    if (btn.badge) {
+                        const badge = document.createElement('span');
+                        badge.className = 'notification-badge';
+                        badge.textContent = btn.badge;
+                        button.style.position = 'relative';
+                        button.appendChild(badge);
+                    }
+                    rowDiv.appendChild(button);
+                });
+
+                keyboard.appendChild(rowDiv);
+            });
+        }
+
+        function createInlineKeyboard(buttons) {
+            const container = document.createElement('div');
+            container.className = 'inline-keyboard';
+
+            buttons.forEach(row => {
+                row.forEach(btn => {
+                    const button = document.createElement('div');
+                    button.className = 'inline-button';
+                    button.textContent = btn.text;
+                    button.onclick = () => handleAction(btn.action, btn.data);
+                    container.appendChild(button);
+                });
+            });
+
+            return container;
+        }
+
+        // Action Handlers
+        async function handleAction(action, data) {
+            console.log('Action:', action, data);
+
+            switch(action) {
+                case 'start':
+                    await showMainMenu();
+                    break;
+                case 'dashboard':
+                    await showSuperDashboard();
+                    break;
+                case 'pending':
+                    await showPendingBusinesses();
+                    break;
+                case 'approve':
+                    await approveBusiness(data);
+                    break;
+                case 'reject':
+                    openRejectionModal(data);
+                    break;
+                case 'users':
+                    await showUsers();
+                    break;
+                case 'businesses':
+                    await showBusinesses();
+                    break;
+                case 'finance':
+                    await showFinance();
+                    break;
+                case 'reports':
+                    await showReports();
+                    break;
+                case 'broadcast':
+                    openBroadcastModal();
+                    break;
+                case 'analytics':
+                    await showAnalytics();
+                    break;
+                case 'settings':
+                    await showSettings();
+                    break;
+                case 'main_menu':
+                    await showMainMenu();
+                    break;
+            }
+        }
+
+        async function showMainMenu() {
+            showMessage('user', '/start');
+            await botReply('👑 Admin Panel\n\nBo\'limni tanlang:');
+
+            const pendingCount = state.platform.pendingBusinesses;
+
+            showKeyboard([
+                [
+                    { text: '📊 Super Dashboard', action: 'dashboard', primary: true }
+                ],
+                [
+                    { text: '⏳ Tasdiq', action: 'pending', badge: pendingCount > 0 ? pendingCount : null },
+                    { text: '👥 Users', action: 'users' }
+                ],
+                [
+                    { text: '🏢 Bizneslar', action: 'businesses' },
+                    { text: '💰 Moliya', action: 'finance' }
+                ],
+                [
+                    { text: '📊 Analytics', action: 'analytics' },
+                    { text: '📢 Broadcast', action: 'broadcast' }
+                ],
+                [
+                    { text: '📋 Hisobotlar', action: 'reports' },
+                    { text: '⚙️ Sozlamalar', action: 'settings' }
+                ]
+            ]);
+        }
+
+        async function showSuperDashboard() {
+            showMessage('user', '📊 Super Dashboard');
+
+            const growth = '+12.5%';
+            const commission = state.platform.monthRevenue * 0.1;
+
+            const dashboard = `
+                <div class="super-dashboard">
+                    <div class="dashboard-title">
+                        👑 SUPER DASHBOARD
+                    </div>
+                    <div class="dashboard-time">⏰ ${new Date().toLocaleString('uz-UZ')}</div>
+
+                    <div style="background: rgba(255,255,255,0.2); padding: 20px; border-radius: 14px; margin-bottom: 15px; backdrop-filter: blur(10px);">
+                        <div style="font-size: 14px; opacity: 0.9; margin-bottom: 8px;">💰 OYLIK KOMISSIYA</div>
+                        <div style="font-size: 36px; font-weight: 700; margin-bottom: 8px;">${formatPrice(commission)}</div>
+                        <div style="font-size: 13px; opacity: 0.9;">so'm (10% dan ${formatPrice(state.platform.monthRevenue)} so'm)</div>
+                    </div>
+
+                    <div class="mega-stats">
+                        <div class="mega-stat">
+                            <div class="mega-stat-icon">👥</div>
+                            <div class="mega-stat-value">${formatNumber(state.platform.totalUsers)}</div>
+                            <div class="mega-stat-label">Foydalanuvchilar</div>
+                        </div>
+                        <div class="mega-stat">
+                            <div class="mega-stat-icon">🏢</div>
+                            <div class="mega-stat-value">${state.platform.activeBusinesses}</div>
+                            <div class="mega-stat-label">Faol bizneslar</div>
+                        </div>
+                        <div class="mega-stat">
+                            <div class="mega-stat-icon">⏳</div>
+                            <div class="mega-stat-value">${state.platform.pendingBusinesses}</div>
+                            <div class="mega-stat-label">Tasdiq kutmoqda</div>
+                        </div>
+                        <div class="mega-stat">
+                            <div class="mega-stat-icon">🔴</div>
+                            <div class="mega-stat-value">${state.platform.activeBookings}</div>
+                            <div class="mega-stat-label">Jonli</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <div class="stat-icon">📅</div>
+                        <div class="stat-value">${state.platform.todayBookings}</div>
+                        <div class="stat-label">Bugun buyurtmalar</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-icon">💵</div>
+                        <div class="stat-value">${formatPrice(state.platform.todayRevenue)}</div>
+                        <div class="stat-label">Bugun daromad</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-icon">📊</div>
+                        <div class="stat-value">${formatNumber(state.platform.monthBookings)}</div>
+                        <div class="stat-label">Oy (jami)</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-icon">💰</div>
+                        <div class="stat-value">${formatPrice(state.platform.monthRevenue)}</div>
+                        <div class="stat-label">Oy daromadi</div>
+                    </div>
+                </div>
+
+                <div class="alert-box alert-info">
+                    📈 O'sish: <strong>${growth}</strong> o'tgan oyga nisbatan
+                </div>
+            `;
+
+            showMessage('bot', dashboard, {
+                inline: [
+                    [
+                        { text: '🔄 Yangilash', action: 'dashboard' },
+                        { text: '📊 Batafsil', action: 'analytics' }
+                    ]
+                ]
+            });
+        }
+
+        async function showPendingBusinesses() {
+            showMessage('user', '⏳ Tasdiq kutmoqda');
+
+            if (state.pendingBusinesses.length === 0) {
+                await botReply('✅ Tasdiq kutayotgan bizneslar yo\'q\n\nBarcha so\'rovlar ko\'rib chiqilgan.');
+                return;
+            }
+
+            await botReply(`⏳ Tasdiq kutmoqda: ${state.pendingBusinesses.length} ta biznes\n\nHar birini ko'rib chiqing:`);
+
+            state.pendingBusinesses.forEach(business => {
+                const daysAgo = Math.floor((Date.now() - business.submittedAt) / (1000 * 60 * 60 * 24));
+                const timeText = daysAgo === 0 ? 'Bugun' : `${daysAgo} kun oldin`;
+
+                const card = `
+                    <div class="pending-card">
+                        <div class="pending-header">
+                            <div class="pending-name">🏢 ${business.name}</div>
+                            <span class="pending-badge">KUTMOQDA</span>
+                        </div>
+                        <div class="pending-details">
+                            <div><strong>👤 Egasi:</strong> ${business.owner}</div>
+                            <div><strong>📞 Telefon:</strong> ${business.phone}</div>
+                            <div><strong>📍 Manzil:</strong> ${business.address}</div>
+                            <div><strong>💬 Telegram:</strong> ${business.telegram}</div>
+                            <div><strong>📅 Yuborilgan:</strong> ${timeText}</div>
+                            <div><strong>🆔 ID:</strong> #${business.id}</div>
+                        </div>
+                        <div class="approval-actions" id="actions-${business.id}">
+                        </div>
+                    </div>
+                `;
+
+                showMessage('bot', card);
+
+                setTimeout(() => {
+                    const actionsDiv = document.getElementById(`actions-${business.id}`);
+                    if (actionsDiv) {
+                        actionsDiv.innerHTML = `
+                            <button class="action-btn btn-approve" onclick="handleAction('approve', ${business.id})">✅ Tasdiqlash</button>
+                            <button class="action-btn btn-reject" onclick="handleAction('reject', ${business.id})">❌ Rad etish</button>
+                        `;
+                    }
+                }, 100);
+            });
+        }
+
+        async function approveBusiness(businessId) {
+            const business = state.pendingBusinesses.find(b => b.id === businessId);
+            
+            await botReply(
+                `✅ Tasdiqlandi!\n\n` +
+                `🏢 ${business.name}\n` +
+                `👤 ${business.owner}\n\n` +
+                `Biznes egasiga xabar yuborildi va platforma faollashtirildi.`
+            );
+
+            // Remove from pending
+            const index = state.pendingBusinesses.findIndex(b => b.id === businessId);
+            if (index > -1) {
+                state.pendingBusinesses.splice(index, 1);
+                state.platform.pendingBusinesses--;
+                state.platform.activeBusinesses++;
+            }
+
+            setTimeout(() => {
+                showMessage('bot', 
+                    `<div class="alert-box alert-success">✅ Audit log saqlandi:<br>Admin: Super Admin<br>Action: Approved<br>Business: ${business.name}</div>`
+                );
+            }, 1000);
+        }
+
+        function openRejectionModal(businessId) {
+            state.rejectionContext = businessId;
+            document.getElementById('rejectionModal').style.display = 'flex';
+            document.getElementById('rejectionReason').focus();
+        }
+
+        function closeRejectionModal() {
+            document.getElementById('rejectionModal').style.display = 'none';
+            document.getElementById('rejectionReason').value = '';
+            state.rejectionContext = null;
+        }
+
+        async function submitRejection() {
+            const reason = document.getElementById('rejectionReason').value.trim();
+            if (!reason) {
+                alert('Iltimos, sabab kiriting!');
+                return;
+            }
+
+            const businessId = state.rejectionContext;
+            const business = state.pendingBusinesses.find(b => b.id === businessId);
+
+            closeRejectionModal();
+
+            showMessage('user', `❌ Rad etish: ${business.name}`);
+
+            await botReply(
+                `❌ Rad etildi\n\n` +
+                `🏢 ${business.name}\n` +
+                `👤 ${business.owner}\n\n` +
+                `Sabab: ${reason}\n\n` +
+                `Biznes egasiga xabar yuborildi.`
+            );
+
+            // Remove from pending
+            const index = state.pendingBusinesses.findIndex(b => b.id === businessId);
+            if (index > -1) {
+                state.pendingBusinesses.splice(index, 1);
+                state.platform.pendingBusinesses--;
+            }
+
+            setTimeout(() => {
+                showMessage('bot', 
+                    `<div class="alert-box alert-warning">📝 Audit log saqlandi:<br>Admin: Super Admin<br>Action: Rejected<br>Reason: ${reason}</div>`
+                );
+            }, 1000);
+        }
+
+        async function showUsers() {
+            showMessage('user', '👥 Foydalanuvchilar');
+
+            await botReply(`👥 Platformadagi foydalanuvchilar: ${formatNumber(state.platform.totalUsers)}\n\nSo'nggi ro'yxatdan o'tganlar:`);
+
+            state.users.forEach(user => {
+                const typeEmoji = user.type === 'driver' ? '🚗' : '🏢';
+                const typeName = user.type === 'driver' ? 'Haydovchi' : 'Biznes';
+
+                const card = `
+                    <div class="user-card">
+                        <div class="user-header">
+                            <div class="user-name">${typeEmoji} ${user.name}</div>
+                            <span class="user-type">${typeName}</span>
+                        </div>
+                        <div class="user-stats">
+                            <div>📞 ${user.phone}</div>
+                            <div>📅 Ro'yxat: ${new Date(user.registeredAt).toLocaleDateString('uz-UZ')}</div>
+                            ${user.type === 'driver' ? `
+                                <div>📦 Buyurtmalar: ${user.totalOrders} ta</div>
+                                <div>💰 Sarflagan: ${formatPrice(user.totalSpent)} so'm</div>
+                            ` : `
+                                <div>📦 Buyurtmalar: ${user.totalOrders} ta</div>
+                                <div>💵 Daromad: ${formatPrice(user.totalRevenue)} so'm</div>
+                            `}
+                        </div>
+                    </div>
+                `;
+
+                showMessage('bot', card);
+            });
+
+            const drivers = Math.floor(state.platform.totalUsers * 0.95);
+            const businesses = state.platform.totalUsers - drivers;
+
+            showMessage('bot', 
+                `<div class="alert-box alert-info">` +
+                `📊 Taqsimot:<br>` +
+                `🚗 Haydovchilar: ${formatNumber(drivers)} (95%)<br>` +
+                `🏢 Bizneslar: ${businesses} (5%)` +
+                `</div>`
+            );
+        }
+
+        async function showBusinesses() {
+            showMessage('user', '🏢 Bizneslar');
+
+            const topBusinesses = `
+                <div class="chart-card">
+                    <div class="chart-title">🏆 TOP Bizneslar (Daromad bo'yicha)</div>
+                    
+                    <div style="margin-top: 15px;">
+                        <div style="display: flex; justify-content: space-between; padding: 15px; background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%); border-radius: 12px; margin-bottom: 10px; color: white;">
+                            <div>
+                                <div style="font-size: 24px; margin-bottom: 5px;">🥇</div>
+                                <div style="font-weight: 700; font-size: 16px;">Premium Auto Wash</div>
+                                <div style="font-size: 13px; opacity: 0.9;">234 buyurtma</div>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="font-weight: 700; font-size: 20px;">${formatPrice(11700000)}</div>
+                                <div style="font-size: 12px; opacity: 0.9;">so'm</div>
+                            </div>
+                        </div>
+
+                        <div style="display: flex; justify-content: space-between; padding: 15px; background: linear-gradient(135deg, #C0C0C0 0%, #A9A9A9 100%); border-radius: 12px; margin-bottom: 10px; color: white;">
+                            <div>
+                                <div style="font-size: 24px; margin-bottom: 5px;">🥈</div>
+                                <div style="font-weight: 700; font-size: 16px;">Crystal Wash</div>
+                                <div style="font-size: 13px; opacity: 0.9;">189 buyurtma</div>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="font-weight: 700; font-size: 20px;">${formatPrice(9450000)}</div>
+                                <div style="font-size: 12px; opacity: 0.9;">so'm</div>
+                            </div>
+                        </div>
+
+                        <div style="display: flex; justify-content: space-between; padding: 15px; background: linear-gradient(135deg, #CD7F32 0%, #B87333 100%); border-radius: 12px; color: white;">
+                            <div>
+                                <div style="font-size: 24px; margin-bottom: 5px;">🥉</div>
+                                <div style="font-weight: 700; font-size: 16px;">Express Wash</div>
+                                <div style="font-size: 13px; opacity: 0.9;">156 buyurtma</div>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="font-weight: 700; font-size: 20px;">${formatPrice(7800000)}</div>
+                                <div style="font-size: 12px; opacity: 0.9;">so'm</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            showMessage('bot', topBusinesses);
+
+            showMessage('bot', 
+                `<div class="alert-box alert-success">` +
+                `✅ Jami faol bizneslar: ${state.platform.activeBusinesses}<br>` +
+                `📈 O'sish: +8 (bu oyda)<br>` +
+                `⭐ O'rtacha reyting: 4.7/5.0` +
+                `</div>`
+            );
+        }
+
+        async function showFinance() {
+            showMessage('user', '💰 Moliya');
+
+            const commission = state.platform.monthRevenue * 0.1;
+            const todayCommission = state.platform.todayRevenue * 0.1;
+
+            const finance = `
+                <div class="revenue-mega-card">
+                    <div class="revenue-label">💰 OYLIK KOMISSIYA (10%)</div>
+                    <div class="revenue-amount">${formatPrice(commission)} so'm</div>
+                    <div class="revenue-breakdown">
+                        <div style="margin-bottom: 8px;">📦 Jami buyurtmalar: ${formatNumber(state.platform.monthBookings)} ta</div>
+                        <div style="margin-bottom: 8px;">💵 Platform daromadi: ${formatPrice(state.platform.monthRevenue)} so'm</div>
+                        <div style="margin-bottom: 8px;">🏢 Bizneslar oladilar: ${formatPrice(state.platform.monthRevenue * 0.9)} so'm</div>
+                        <div style="font-weight: 700; font-size: 16px; padding-top: 10px; border-top: 2px solid rgba(0,0,0,0.1);">
+                            ✅ AutoWash komissiyasi: ${formatPrice(commission)} so'm
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chart-card">
+                    <div class="chart-title">📅 Bugungi moliya</div>
+                    <div style="text-align: center; margin: 20px 0;">
+                        <div style="font-size: 32px; font-weight: 700; color: #8B0000; margin-bottom: 10px;">
+                            ${formatPrice(todayCommission)} so'm
+                        </div>
+                        <div style="color: #666; font-size: 14px;">Komissiya (${state.platform.todayBookings} buyurtmadan)</div>
+                    </div>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <div class="stat-icon">📊</div>
+                        <div class="stat-value">${formatPrice(state.platform.monthRevenue / state.platform.monthBookings)}</div>
+                        <div class="stat-label">O'rtacha check</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-icon">💳</div>
+                        <div class="stat-value">${formatPrice(commission / state.platform.activeBusinesses)}</div>
+                        <div class="stat-label">Biznes/komissiya</div>
+                    </div>
+                </div>
+
+                <div class="alert-box alert-info">
+                    💡 To'lov har oyning 5-kunida bizneslar hisobiga o'tkaziladi
+                </div>
+            `;
+
+            showMessage('bot', finance);
+        }
+
+        async function showReports() {
+            showMessage('user', '📋 Hisobotlar');
+
+            const reports = `
+                <div class="chart-card">
+                    <div class="chart-title">📊 Haftalik Hisobot</div>
+                    <div class="chart-container">
+                        <canvas id="weeklyChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="chart-card">
+                    <div class="chart-title">📈 O'sish Dinamikasi</div>
+                    <div class="chart-container">
+                        <canvas id="growthChart"></canvas>
+                    </div>
+                </div>
+            `;
+
+            showMessage('bot', reports);
+
+            // Draw charts
+            setTimeout(() => {
+                // Weekly chart
+                const weeklyCtx = document.getElementById('weeklyChart');
+                if (weeklyCtx) {
+                    new Chart(weeklyCtx, {
+                        type: 'bar',
+                        data: {
+                            labels: ['Dush', 'Sesh', 'Chor', 'Pay', 'Juma', 'Shan', 'Yak'],
+                            datasets: [{
+                                label: 'Buyurtmalar',
+                                data: [450, 520, 480, 650, 720, 890, 780],
+                                backgroundColor: 'rgba(139, 0, 0, 0.7)',
+                                borderColor: '#8B0000',
+                                borderWidth: 2
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: { legend: { display: false } }
+                        }
+                    });
+                }
+
+                // Growth chart
+                const growthCtx = document.getElementById('growthChart');
+                if (growthCtx) {
+                    new Chart(growthCtx, {
+                        type: 'line',
+                        data: {
+                            labels: ['Yan', 'Fev', 'Mar', 'Apr', 'May', 'Iyun'],
+                            datasets: [{
+                                label: 'Foydalanuvchilar',
+                                data: [3200, 5800, 8500, 11200, 13800, 15234],
+                                borderColor: '#8B0000',
+                                backgroundColor: 'rgba(139, 0, 0, 0.1)',
+                                tension: 0.4,
+                                fill: true
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: { legend: { display: false } }
+                        }
+                    });
+                }
+            }, 100);
+        }
+
+        function openBroadcastModal() {
+            showMessage('user', '📢 Broadcast');
+            document.getElementById('broadcastModal').style.display = 'flex';
+            document.getElementById('broadcastMessage').focus();
+        }
+
+        function closeBroadcastModal() {
+            document.getElementById('broadcastModal').style.display = 'none';
+            document.getElementById('broadcastMessage').value = '';
+            state.selectedTarget = null;
+            document.querySelectorAll('.target-option').forEach(o => o.classList.remove('active'));
+        }
+
+        async function sendBroadcast() {
+            const message = document.getElementById('broadcastMessage').value.trim();
+            if (!message) {
+                alert('Xabar matnini kiriting!');
+                return;
+            }
+
+            if (!state.selectedTarget) {
+                alert('Maqsadni tanlang!');
+                return;
+            }
+
+            closeBroadcastModal();
+
+            await botReply('📤 Yuborilmoqda...');
+
+            // Simulate sending
+            await sleep(2000);
+
+            const targetCounts = {
+                'all_users': state.platform.totalUsers,
+                'all_business': state.platform.activeBusinesses,
+                'active_users': Math.floor(state.platform.totalUsers * 0.7),
+                'new_users': Math.floor(state.platform.totalUsers * 0.05)
+            };
+
+            const targetNames = {
+                'all_users': 'Barcha foydalanuvchilar',
+                'all_business': 'Barcha bizneslar',
+                'active_users': 'Faol foydalanuvchilar',
+                'new_users': 'Yangi foydalanuvchilar'
+            };
+
+            const sent = targetCounts[state.selectedTarget];
+            const failed = Math.floor(sent * 0.02); // 2% failed
+
+            await botReply(
+                `✅ Xabar yuborildi!\n\n` +
+                `🎯 Maqsad: ${targetNames[state.selectedTarget]}\n` +
+                `📤 Yuborildi: ${formatNumber(sent - failed)}\n` +
+                `❌ Xato: ${failed}\n` +
+                `📊 Jami: ${formatNumber(sent)}\n\n` +
+                `💬 Matn: "${message.substring(0, 50)}${message.length > 50 ? '...' : ''}"`
+            );
+
+            setTimeout(() => {
+                showMessage('bot', 
+                    `<div class="alert-box alert-success">` +
+                    `✅ Broadcast log saqlandi<br>` +
+                    `⏰ Vaqt: ${new Date().toLocaleString('uz-UZ')}<br>` +
+                    `👤 Admin: Super Admin` +
+                    `</div>`
+                );
+            }, 1000);
+        }
+
+        async function showAnalytics() {
+            showMessage('user', '📊 Analytics');
+
+            const analytics = `
+                <div class="chart-card">
+                    <div class="chart-title">📊 Platforma Statistikasi</div>
+                    
+                    <div style="margin: 20px 0;">
+                        <div style="margin-bottom: 15px;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                <span style="font-size: 13px; font-weight: 600;">👥 Foydalanuvchilar</span>
+                                <span style="font-size: 13px; font-weight: 700;">${formatNumber(state.platform.totalUsers)}</span>
+                            </div>
+                            <div style="width: 100%; height: 8px; background: #e0e0e0; border-radius: 4px; overflow: hidden;">
+                                <div style="width: 95%; height: 100%; background: linear-gradient(90deg, #8B0000 0%, #DC143C 100%);"></div>
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom: 15px;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                <span style="font-size: 13px; font-weight: 600;">🏢 Bizneslar</span>
+                                <span style="font-size: 13px; font-weight: 700;">${state.platform.activeBusinesses}</span>
+                            </div>
+                            <div style="width: 100%; height: 8px; background: #e0e0e0; border-radius: 4px; overflow: hidden;">
+                                <div style="width: 85%; height: 100%; background: linear-gradient(90deg, #FFD700 0%, #FFA500 100%);"></div>
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom: 15px;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                <span style="font-size: 13px; font-weight: 600;">📦 Buyurtmalar</span>
+                                <span style="font-size: 13px; font-weight: 700;">${formatNumber(state.platform.monthBookings)}</span>
+                            </div>
+                            <div style="width: 100%; height: 8px; background: #e0e0e0; border-radius: 4px; overflow: hidden;">
+                                <div style="width: 78%; height: 100%; background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px;">
+                        <div style="text-align: center; padding: 15px; background: #f8f9fa; border-radius: 10px;">
+                            <div style="font-size: 24px; font-weight: 700; color: #28a745;">92%</div>
+                            <div style="font-size: 12px; color: #666;">Retention rate</div>
+                        </div>
+                        <div style="text-align: center; padding: 15px; background: #f8f9fa; border-radius: 10px;">
+                            <div style="font-size: 24px; font-weight: 700; color: #8B0000;">4.8</div>
+                            <div style="font-size: 12px; color: #666;">O'rtacha reyting</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            showMessage('bot', analytics);
+
+            showMessage('bot', 
+                `<div class="alert-box alert-success">` +
+                `📈 Platforma o'sishi:<br>` +
+                `• Foydalanuvchilar: +12.5% (oylik)<br>` +
+                `• Bizneslar: +8.3% (oylik)<br>` +
+                `• Daromad: +15.7% (oylik)` +
+                `</div>`
+            );
+        }
+
+        async function showSettings() {
+            showMessage('user', '⚙️ Sozlamalar');
+
+            const settings = `
+                <div class="chart-card">
+                    <div class="chart-title">⚙️ Tizim Sozlamalari</div>
+                    
+                    <div style="margin-top: 20px;">
+                        <div style="padding: 15px; background: #f8f9fa; border-radius: 10px; margin-bottom: 12px;">
+                            <div style="font-weight: 600; margin-bottom: 8px;">💳 Komissiya stavkasi</div>
+                            <div style="font-size: 24px; font-weight: 700; color: #8B0000;">10%</div>
+                        </div>
+
+                        <div style="padding: 15px; background: #f8f9fa; border-radius: 10px; margin-bottom: 12px;">
+                            <div style="font-weight: 600; margin-bottom: 8px;">📱 SMS Provider</div>
+                            <div style="color: #666;">Eskiz.uz (Active)</div>
+                        </div>
+
+                        <div style="padding: 15px; background: #f8f9fa; border-radius: 10px; margin-bottom: 12px;">
+                            <div style="font-weight: 600; margin-bottom: 8px;">💰 Payment Gateway</div>
+                            <div style="color: #666;">Click, Payme, Uzcard</div>
+                        </div>
+
+                        <div style="padding: 15px; background: #f8f9fa; border-radius: 10px; margin-bottom: 12px;">
+                            <div style="font-weight: 600; margin-bottom: 8px;">👥 Admin'lar</div>
+                            <div style="color: #666;">3 ta Super Admin</div>
+                        </div>
+
+                        <div style="padding: 15px; background: #f8f9fa; border-radius: 10px;">
+                            <div style="font-weight: 600; margin-bottom: 8px;">🔒 Xavfsizlik</div>
+                            <div style="color: #666;">2FA enabled, SSL active</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            showMessage('bot', settings);
+
+            showMessage('bot', 
+                `<div class="alert-box alert-info">` +
+                `ℹ️ Sozlamalarni o'zgartirish uchun server'ga murojaat qiling` +
+                `</div>`
+            );
+        }
+
+        // Utility Functions
+        function formatPrice(price) {
+            return Math.round(price).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+        }
+
+        function formatNumber(num) {
+            if (num >= 1000) {
+                return (num / 1000).toFixed(1) + 'K';
+            }
+            return num.toString();
+        }
+
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        // Initialize on load
+        window.onload = init;
+    </script>
+</body>
+</html>
