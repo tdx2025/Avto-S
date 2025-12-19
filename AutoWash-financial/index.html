@@ -1,0 +1,1318 @@
+
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AutoWash - Xarajatlar va Daromadlar Jadvali</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 36px;
+            color: #1e3c72;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 16px;
+            color: #666;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .tab {
+            padding: 15px 30px;
+            background: transparent;
+            border: none;
+            font-size: 16px;
+            font-weight: 600;
+            color: #666;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .tab.active {
+            color: #1e3c72;
+            border-bottom-color: #1e3c72;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1e3c72;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #e0e0e0;
+            font-size: 14px;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .highlight-row {
+            background: #fff3cd !important;
+            font-weight: 700;
+        }
+
+        .total-row {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%) !important;
+            color: white !important;
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        .total-row td {
+            border-bottom: none;
+        }
+
+        .chart-container {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+        }
+
+        .chart-wrapper {
+            height: 400px;
+            position: relative;
+        }
+
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .summary-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .summary-card.red {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+        }
+
+        .summary-card.green {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        }
+
+        .summary-card.gold {
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+            color: #000;
+        }
+
+        .card-title {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 10px;
+        }
+
+        .card-value {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .card-subtitle {
+            font-size: 13px;
+            opacity: 0.85;
+        }
+
+        .alert {
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border-left: 4px solid #17a2b8;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border-left: 4px solid #28a745;
+        }
+
+        .alert-warning {
+            background: #fff3cd;
+            color: #856404;
+            border-left: 4px solid #ffc107;
+        }
+
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .comparison-card {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .comparison-card.winner {
+            border-color: #28a745;
+            background: linear-gradient(to bottom, #d4edda 0%, white 50%);
+        }
+
+        .comparison-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1e3c72;
+            margin-bottom: 15px;
+        }
+
+        .comparison-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #28a745;
+            margin-bottom: 10px;
+        }
+
+        .comparison-label {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .badge-success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .badge-warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .badge-danger {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .formula-box {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+            border-radius: 4px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 24px;
+            }
+
+            .comparison-grid {
+                grid-template-columns: 1fr;
+            }
+
+            table {
+                font-size: 12px;
+            }
+
+            th, td {
+                padding: 10px;
+            }
+        }
+
+        .timeline {
+            position: relative;
+            padding: 20px 0;
+        }
+
+        .timeline-item {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .timeline-marker {
+            width: 40px;
+            height: 40px;
+            background: #667eea;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .timeline-content {
+            flex: 1;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+        }
+
+        .timeline-title {
+            font-weight: 700;
+            color: #1e3c72;
+            margin-bottom: 8px;
+        }
+
+        .print-button {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(40,167,69,0.4);
+            transition: all 0.3s;
+        }
+
+        .print-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(40,167,69,0.5);
+        }
+
+        @media print {
+            body {
+                background: white;
+            }
+            .tabs, .print-button {
+                display: none;
+            }
+            .tab-content {
+                display: block !important;
+            }
+            .container {
+                box-shadow: none;
+                padding: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💰 AutoWash - Moliyaviy Tahlil</h1>
+            <p>Xarajatlar, Daromadlar va ROI Prognozi</p>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('startup')">💼 Startup Xarajatlari</button>
+            <button class="tab" onclick="showTab('operational')">🔄 Operatsion Xarajatlar</button>
+            <button class="tab" onclick="showTab('revenue')">💰 Daromad Modeli</button>
+            <button class="tab" onclick="showTab('projections')">📈 Prognozlar</button>
+            <button class="tab" onclick="showTab('roi')">🎯 ROI Tahlili</button>
+        </div>
+
+        <!-- TAB 1: STARTUP XARAJATLARI -->
+        <div id="startup" class="tab-content active">
+            <div class="section">
+                <h2 class="section-title">💼 Boshlang'ich Investitsiya (Startup Costs)</h2>
+
+                <div class="alert alert-info">
+                    <strong>📊 Ikkita variant:</strong> Minimal (DIY) va Optimal (Professional team)
+                </div>
+
+                <h3 style="margin: 30px 0 20px; color: #1e3c72;">🚀 VARIANT 1: MINIMAL (DIY Approach)</h3>
+                
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Xarajat turi</th>
+                            <th>Tavsif</th>
+                            <th>Narx (USD)</th>
+                            <th>Narx (UZS)</th>
+                            <th>Izoh</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Development Tools</strong></td>
+                            <td>IDE, Git, testing tools</td>
+                            <td>$0</td>
+                            <td>0 so'm</td>
+                            <td><span class="badge badge-success">Free</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Learning Resources</strong></td>
+                            <td>Node.js, Telegram Bot API courses</td>
+                            <td>$0 - $50</td>
+                            <td>0 - 600,000 so'm</td>
+                            <td>YouTube, Udemy</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Domain Name</strong></td>
+                            <td>autowash.uz</td>
+                            <td>$10/year</td>
+                            <td>120,000 so'm</td>
+                            <td>Local registrar</td>
+                        </tr>
+                        <tr>
+                            <td><strong>SSL Certificate</strong></td>
+                            <td>Cloudflare SSL</td>
+                            <td>$0</td>
+                            <td>0 so'm</td>
+                            <td><span class="badge badge-success">Free</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Initial Testing</strong></td>
+                            <td>Beta test, bug fixes</td>
+                            <td>$0</td>
+                            <td>0 so'm</td>
+                            <td>O'zingiz</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Legal (MCHJ)</strong></td>
+                            <td>Company registration</td>
+                            <td>$100</td>
+                            <td>1,200,000 so'm</td>
+                            <td>One-time</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Marketing Materials</strong></td>
+                            <td>Flyers, banners (basic)</td>
+                            <td>$100</td>
+                            <td>1,200,000 so'm</td>
+                            <td>Canva + local print</td>
+                        </tr>
+                        <tr class="total-row">
+                            <td colspan="2"><strong>JAMI MINIMAL</strong></td>
+                            <td><strong>$210 - $260</strong></td>
+                            <td><strong>2,520,000 - 3,120,000 so'm</strong></td>
+                            <td><strong>~$250</strong></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3 style="margin: 40px 0 20px; color: #1e3c72;">💎 VARIANT 2: OPTIMAL (Professional)</h3>
+                
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Xarajat turi</th>
+                            <th>Tavsif</th>
+                            <th>Narx (USD)</th>
+                            <th>Narx (UZS)</th>
+                            <th>Izoh</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Backend Developer</strong></td>
+                            <td>Node.js expert (3 oy)</td>
+                            <td>$3,000</td>
+                            <td>36,000,000 so'm</td>
+                            <td>$1,000/oy × 3</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Frontend/Mobile Developer</strong></td>
+                            <td>React Native (2 oy)</td>
+                            <td>$2,000</td>
+                            <td>24,000,000 so'm</td>
+                            <td>$1,000/oy × 2</td>
+                        </tr>
+                        <tr>
+                            <td><strong>UI/UX Designer</strong></td>
+                            <td>Full design system</td>
+                            <td>$800</td>
+                            <td>9,600,000 so'm</td>
+                            <td>One-time</td>
+                        </tr>
+                        <tr>
+                            <td><strong>QA Tester</strong></td>
+                            <td>Testing (1 oy)</td>
+                            <td>$500</td>
+                            <td>6,000,000 so'm</td>
+                            <td>Part-time</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Project Manager</strong></td>
+                            <td>Coordination (3 oy)</td>
+                            <td>$1,500</td>
+                            <td>18,000,000 so'm</td>
+                            <td>$500/oy × 3</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Domain & Hosting Setup</strong></td>
+                            <td>Professional setup</td>
+                            <td>$200</td>
+                            <td>2,400,000 so'm</td>
+                            <td>Premium</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Marketing Campaign</strong></td>
+                            <td>Launch campaign</td>
+                            <td>$2,000</td>
+                            <td>24,000,000 so'm</td>
+                            <td>Social media, ads</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Legal & Accounting</strong></td>
+                            <td>MCHJ + consultation</td>
+                            <td>$500</td>
+                            <td>6,000,000 so'm</td>
+                            <td>Professional</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Contingency (10%)</strong></td>
+                            <td>Unexpected costs</td>
+                            <td>$1,050</td>
+                            <td>12,600,000 so'm</td>
+                            <td>Buffer</td>
+                        </tr>
+                        <tr class="total-row">
+                            <td colspan="2"><strong>JAMI OPTIMAL</strong></td>
+                            <td><strong>$11,550</strong></td>
+                            <td><strong>138,600,000 so'm</strong></td>
+                            <td><strong>~$11.5K</strong></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="summary-cards">
+                    <div class="summary-card green">
+                        <div class="card-title">✅ Minimal Budget</div>
+                        <div class="card-value">$250</div>
+                        <div class="card-subtitle">DIY yondashuv</div>
+                    </div>
+                    <div class="summary-card gold">
+                        <div class="card-title">⭐ Tavsiya etiladigan</div>
+                        <div class="card-value">$5,000</div>
+                        <div class="card-subtitle">Aralash yondashuv</div>
+                    </div>
+                    <div class="summary-card red">
+                        <div class="card-title">💎 Premium</div>
+                        <div class="card-value">$11,550</div>
+                        <div class="card-subtitle">Professional jamoa</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 2: OPERATSION XARAJATLAR -->
+        <div id="operational" class="tab-content">
+            <div class="section">
+                <h2 class="section-title">🔄 Oylik Operatsion Xarajatlar</h2>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Xarajat</th>
+                            <th>Minimal</th>
+                            <th>O'rtacha</th>
+                            <th>Optimal</th>
+                            <th>Izoh</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>🖥️ Server/VPS</strong></td>
+                            <td>$6/oy</td>
+                            <td>$20/oy</td>
+                            <td>$50/oy</td>
+                            <td>DigitalOcean, AWS</td>
+                        </tr>
+                        <tr>
+                            <td><strong>📱 SMS Gateway</strong></td>
+                            <td>$50/oy</td>
+                            <td>$150/oy</td>
+                            <td>$300/oy</td>
+                            <td>Eskiz.uz (1000-5000 SMS)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>💳 Payment Gateway</strong></td>
+                            <td>2% trans</td>
+                            <td>2% trans</td>
+                            <td>1.5% trans</td>
+                            <td>Click, Payme fees</td>
+                        </tr>
+                        <tr>
+                            <td><strong>🗄️ Database Backup</strong></td>
+                            <td>$0</td>
+                            <td>$10/oy</td>
+                            <td>$30/oy</td>
+                            <td>Automated backups</td>
+                        </tr>
+                        <tr>
+                            <td><strong>🔒 SSL & Security</strong></td>
+                            <td>$0</td>
+                            <td>$10/oy</td>
+                            <td>$25/oy</td>
+                            <td>Cloudflare Pro</td>
+                        </tr>
+                        <tr>
+                            <td><strong>📊 Analytics Tools</strong></td>
+                            <td>$0</td>
+                            <td>$15/oy</td>
+                            <td>$50/oy</td>
+                            <td>Mixpanel, Amplitude</td>
+                        </tr>
+                        <tr>
+                            <td><strong>👨‍💻 Tech Support</strong></td>
+                            <td>$0</td>
+                            <td>$200/oy</td>
+                            <td>$500/oy</td>
+                            <td>Part-time developer</td>
+                        </tr>
+                        <tr>
+                            <td><strong>📢 Marketing</strong></td>
+                            <td>$50/oy</td>
+                            <td>$300/oy</td>
+                            <td>$1,000/oy</td>
+                            <td>Ads, promotions</td>
+                        </tr>
+                        <tr>
+                            <td><strong>🏢 Office/Coworking</strong></td>
+                            <td>$0</td>
+                            <td>$100/oy</td>
+                            <td>$300/oy</td>
+                            <td>Optional</td>
+                        </tr>
+                        <tr>
+                            <td><strong>⚖️ Legal/Accounting</strong></td>
+                            <td>$20/oy</td>
+                            <td>$50/oy</td>
+                            <td>$100/oy</td>
+                            <td>Monthly reporting</td>
+                        </tr>
+                        <tr class="total-row">
+                            <td><strong>OYLIK JAMI</strong></td>
+                            <td><strong>$126/oy</strong></td>
+                            <td><strong>$855/oy</strong></td>
+                            <td><strong>$2,355/oy</strong></td>
+                            <td><strong>+ Trans fees</strong></td>
+                        </tr>
+                        <tr class="highlight-row">
+                            <td><strong>YILLIK JAMI</strong></td>
+                            <td><strong>$1,512</strong></td>
+                            <td><strong>$10,260</strong></td>
+                            <td><strong>$28,260</strong></td>
+                            <td><strong>12 oy</strong></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="chart-container">
+                    <h3 style="margin-bottom: 20px; color: #1e3c72;">📊 Oylik Xarajatlar Taqsimoti</h3>
+                    <div class="chart-wrapper">
+                        <canvas id="costBreakdownChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 3: DAROMAD MODELI -->
+        <div id="revenue" class="tab-content">
+            <div class="section">
+                <h2 class="section-title">💰 Daromad Modeli va Unit Economics</h2>
+
+                <div class="alert alert-success">
+                    <strong>💡 Biznes Model:</strong> 10% komissiya har bir yuvishdan
+                </div>
+
+                <h3 style="margin: 30px 0 20px; color: #1e3c72;">📐 Hisoblash Formulasi</h3>
+
+                <div class="formula-box">
+                    <strong>Oylik Daromad =</strong><br>
+                    (Kunlik Yuvishlar × 30 kun) × O'rtacha Check × Komissiya (10%)
+                    <br><br>
+                    <strong>Misol:</strong><br>
+                    (100 yuvish/kun × 30) × 50,000 so'm × 10% = 15,000,000 so'm/oy
+                </div>
+
+                <h3 style="margin: 40px 0 20px; color: #1e3c72;">🎯 Konservativ Prognoz (1 yil)</h3>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Oy</th>
+                            <th>Kunlik Yuvish</th>
+                            <th>Oylik Yuvish</th>
+                            <th>O'rtacha Check</th>
+                            <th>Jami Hajm</th>
+                            <th>Komissiya (10%)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>1-oy</strong></td>
+                            <td>10</td>
+                            <td>300</td>
+                            <td>50,000 so'm</td>
+                            <td>15,000,000 so'm</td>
+                            <td><strong>1,500,000 so'm</strong></td>
+                        </tr>
+                        <tr>
+                            <td><strong>2-oy</strong></td>
+                            <td>25</td>
+                            <td>750</td>
+                            <td>50,000 so'm</td>
+                            <td>37,500,000 so'm</td>
+                            <td><strong>3,750,000 so'm</strong></td>
+                        </tr>
+                        <tr>
+                            <td><strong>3-oy</strong></td>
+                            <td>50</td>
+                            <td>1,500</td>
+                            <td>50,000 so'm</td>
+                            <td>75,000,000 so'm</td>
+                            <td><strong>7,500,000 so'm</strong></td>
+                        </tr>
+                        <tr>
+                            <td><strong>4-6 oy</strong></td>
+                            <td>75</td>
+                            <td>2,250</td>
+                            <td>50,000 so'm</td>
+                            <td>112,500,000 so'm</td>
+                            <td><strong>11,250,000 so'm</strong></td>
+                        </tr>
+                        <tr>
+                            <td><strong>7-9 oy</strong></td>
+                            <td>100</td>
+                            <td>3,000</td>
+                            <td>50,000 so'm</td>
+                            <td>150,000,000 so'm</td>
+                            <td><strong>15,000,000 so'm</strong></td>
+                        </tr>
+                        <tr>
+                            <td><strong>10-12 oy</strong></td>
+                            <td>125</td>
+                            <td>3,750</td>
+                            <td>50,000 so'm</td>
+                            <td>187,500,000 so'm</td>
+                            <td><strong>18,750,000 so'm</strong></td>
+                        </tr>
+                        <tr class="total-row">
+                            <td colspan="2"><strong>1-YIL JAMI</strong></td>
+                            <td><strong>21,300</strong></td>
+                            <td><strong>50,000 so'm</strong></td>
+                            <td><strong>1,065,000,000 so'm</strong></td>
+                            <td><strong>106,500,000 so'm</strong></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="alert alert-info">
+                    <strong>📊 1-yil daromad:</strong> 106,500,000 so'm ≈ $8,875 (USD)
+                </div>
+
+                <h3 style="margin: 40px 0 20px; color: #1e3c72;">🚀 Optimistik Prognoz (Tez o'sish)</h3>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Davr</th>
+                            <th>Kunlik Yuvish</th>
+                            <th>Oylik Daromad</th>
+                            <th>Yillik Daromad</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>1-6 oy</strong></td>
+                            <td>50 → 150</td>
+                            <td>7.5M → 22.5M so'm</td>
+                            <td>90,000,000 so'm</td>
+                        </tr>
+                        <tr>
+                            <td><strong>7-12 oy</strong></td>
+                            <td>150 → 300</td>
+                            <td>22.5M → 45M so'm</td>
+                            <td>202,500,000 so'm</td>
+                        </tr>
+                        <tr class="total-row">
+                            <td colspan="2"><strong>1-YIL JAMI</strong></td>
+                            <td><strong>~30M so'm/oy</strong></td>
+                            <td><strong>292,500,000 so'm</strong></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="alert alert-success">
+                    <strong>🎯 Optimistik 1-yil:</strong> 292,500,000 so'm ≈ $24,375 (USD)
+                </div>
+
+                <div class="chart-container">
+                    <h3 style="margin-bottom: 20px; color: #1e3c72;">📈 Daromad O'sishi (12 oy)</h3>
+                    <div class="chart-wrapper">
+                        <canvas id="revenueGrowthChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 4: PROGNOZLAR -->
+        <div id="projections" class="tab-content">
+            <div class="section">
+                <h2 class="section-title">📈 3 Yillik Prognoz</h2>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Yil</th>
+                            <th>Avtomoykalar</th>
+                            <th>Kunlik Yuvish</th>
+                            <th>Oylik Daromad</th>
+                            <th>Yillik Daromad</th>
+                            <th>Kumulyativ</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>1-yil</strong></td>
+                            <td>5-10</td>
+                            <td>50-150</td>
+                            <td>7.5M - 22.5M</td>
+                            <td><strong>106,500,000 so'm</strong></td>
+                            <td>106.5M</td>
+                        </tr>
+                        <tr>
+                            <td><strong>2-yil</strong></td>
+                            <td>15-30</td>
+                            <td>200-400</td>
+                            <td>30M - 60M</td>
+                            <td><strong>450,000,000 so'm</strong></td>
+                            <td>556.5M</td>
+                        </tr>
+                        <tr>
+                            <td><strong>3-yil</strong></td>
+                            <td>40-60</td>
+                            <td>500-800</td>
+                            <td>75M - 120M</td>
+                            <td><strong>975,000,000 so'm</strong></td>
+                            <td>1,531.5M</td>
+                        </tr>
+                        <tr class="total-row">
+                            <td colspan="4"><strong>3 YIL JAMI</strong></td>
+                            <td colspan="2"><strong>1,531,500,000 so'm ≈ $127,625</strong></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3 style="margin: 40px 0 20px; color: #1e3c72;">🎯 Maqsadlar bo'yicha Taqsimot</h3>
+
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-marker">1</div>
+                        <div class="timeline-content">
+                            <div class="timeline-title">🎯 3 Oy: Pilot Launch</div>
+                            <p><strong>Target:</strong> 5 avtomoyka, 50 kunlik yuvish</p>
+                            <p><strong>Daromad:</strong> ~7,500,000 so'm/oy</p>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-marker">2</div>
+                        <div class="timeline-content">
+                            <div class="timeline-title">🚀 6 Oy: Toshkent Kengayish</div>
+                            <p><strong>Target:</strong> 10 avtomoyka, 100 kunlik yuvish</p>
+                            <p><strong>Daromad:</strong> ~15,000,000 so'm/oy</p>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-marker">3</div>
+                        <div class="timeline-content">
+                            <div class="timeline-title">💎 12 Oy: Toshkent Dominance</div>
+                            <p><strong>Target:</strong> 15-20 avtomoyka, 150+ kunlik</p>
+                            <p><strong>Daromad:</strong> ~22,500,000 so'm/oy</p>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-marker">4</div>
+                        <div class="timeline-content">
+                            <div class="timeline-title">🌟 18 Oy: Multi-City</div>
+                            <p><strong>Target:</strong> Samarqand, Buxoro, Andijon</p>
+                            <p><strong>Daromad:</strong> ~37,500,000 so'm/oy</p>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-marker">5</div>
+                        <div class="timeline-content">
+                            <div class="timeline-title">👑 24 Oy: National Leader</div>
+                            <p><strong>Target:</strong> 30+ avtomoyka, barcha viloyatlar</p>
+                            <p><strong>Daromad:</strong> ~60,000,000 so'm/oy</p>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-marker">6</div>
+                        <div class="timeline-content">
+                            <div class="timeline-title">🚀 36 Oy: Regional Expansion</div>
+                            <p><strong>Target:</strong> Qozog'iston, Tojikiston</p>
+                            <p><strong>Daromad:</strong> ~97,500,000 so'm/oy</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chart-container">
+                    <h3 style="margin-bottom: 20px; color: #1e3c72;">📊 3 Yillik O'sish Prognozi</h3>
+                    <div class="chart-wrapper">
+                        <canvas id="threeYearChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 5: ROI TAHLILI -->
+        <div id="roi" class="tab-content">
+            <div class="section">
+                <h2 class="section-title">🎯 ROI (Return on Investment) Tahlili</h2>
+
+                <div class="alert alert-warning">
+                    <strong>⚠️ Muhim:</strong> ROI hisoblashlari konservativ prognozga asoslangan
+                </div>
+
+                <h3 style="margin: 30px 0 20px; color: #1e3c72;">💼 Minimal Budget Scenario</h3>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Ko'rsatkich</th>
+                            <th>Qiymat</th>
+                            <th>Izoh</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Boshlang'ich Investitsiya</strong></td>
+                            <td>$250 (3,000,000 so'm)</td>
+                            <td>Startup costs</td>
+                        </tr>
+                        <tr>
+                            <td><strong>1-yil Operatsion</strong></td>
+                            <td>$1,512 (18,144,000 so'm)</td>
+                            <td>$126/oy × 12</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Jami Xarajat (1-yil)</strong></td>
+                            <td>$1,762 (21,144,000 so'm)</td>
+                            <td>Startup + Operational</td>
+                        </tr>
+                        <tr class="highlight-row">
+                            <td><strong>1-yil Daromad</strong></td>
+                            <td>$8,875 (106,500,000 so'm)</td>
+                            <td>Conservative</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Net Profit</strong></td>
+                            <td>$7,113 (85,356,000 so'm)</td>
+                            <td>Daromad - Xarajat</td>
+                        </tr>
+                        <tr class="total-row">
+                            <td><strong>ROI (1-yil)</strong></td>
+                            <td><strong>403.8%</strong></td>
+                            <td><strong>Juda yuqori!</strong></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Payback Period</strong></td>
+                            <td><strong>2-3 oy</strong></td>
+                            <td>Investitsiya qaytish</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="formula-box">
+                    <strong>ROI Formula:</strong><br>
+                    ROI = (Net Profit / Total Investment) × 100<br>
+                    ROI = ($7,113 / $1,762) × 100 = 403.8%
+                </div>
+
+                <h3 style="margin: 40px 0 20px; color: #1e3c72;">💎 Optimal Budget Scenario</h3>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Ko'rsatkich</th>
+                            <th>Qiymat</th>
+                            <th>Izoh</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Boshlang'ich Investitsiya</strong></td>
+                            <td>$11,550 (138,600,000 so'm)</td>
+                            <td>Professional team</td>
+                        </tr>
+                        <tr>
+                            <td><strong>1-yil Operatsion</strong></td>
+                            <td>$10,260 (123,120,000 so'm)</td>
+                            <td>$855/oy × 12</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Jami Xarajat (1-yil)</strong></td>
+                            <td>$21,810 (261,720,000 so'm)</td>
+                            <td>Startup + Operational</td>
+                        </tr>
+                        <tr class="highlight-row">
+                            <td><strong>1-yil Daromad (Optimistic)</strong></td>
+                            <td>$24,375 (292,500,000 so'm)</td>
+                            <td>With pro team</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Net Profit</strong></td>
+                            <td>$2,565 (30,780,000 so'm)</td>
+                            <td>Daromad - Xarajat</td>
+                        </tr>
+                        <tr class="total-row">
+                            <td><strong>ROI (1-yil)</strong></td>
+                            <td><strong>11.8%</strong></td>
+                            <td><strong>Musbat</strong></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Payback Period</strong></td>
+                            <td><strong>10-11 oy</strong></td>
+                            <td>Investment qaytish</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3 style="margin: 40px 0 20px; color: #1e3c72;">📊 3 Yillik ROI Comparison</h3>
+
+                <div class="comparison-grid">
+                    <div class="comparison-card">
+                        <div class="comparison-title">💚 Minimal</div>
+                        <div class="comparison-value">403%</div>
+                        <div class="comparison-label">1-yil ROI</div>
+                        <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #e0e0e0;">
+                            <div style="font-size: 20px; font-weight: 700; color: #1e3c72;">4,037%</div>
+                            <div style="font-size: 12px; color: #666;">3-yil ROI</div>
+                        </div>
+                    </div>
+
+                    <div class="comparison-card winner">
+                        <div class="comparison-title">⭐ O'rtacha</div>
+                        <div class="comparison-value">156%</div>
+                        <div class="comparison-label">1-yil ROI</div>
+                        <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #e0e0e0;">
+                            <div style="font-size: 20px; font-weight: 700; color: #1e3c72;">1,247%</div>
+                            <div style="font-size: 12px; color: #666;">3-yil ROI</div>
+                        </div>
+                    </div>
+
+                    <div class="comparison-card">
+                        <div class="comparison-title">💎 Optimal</div>
+                        <div class="comparison-value">12%</div>
+                        <div class="comparison-label">1-yil ROI</div>
+                        <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #e0e0e0;">
+                            <div style="font-size: 20px; font-weight: 700; color: #1e3c72;">229%</div>
+                            <div style="font-size: 12px; color: #666;">3-yil ROI</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chart-container">
+                    <h3 style="margin-bottom: 20px; color: #1e3c72;">📈 ROI Comparison by Scenario</h3>
+                    <div class="chart-wrapper">
+                        <canvas id="roiComparisonChart"></canvas>
+                    </div>
+                </div>
+
+                <h3 style="margin: 40px 0 20px; color: #1e3c72;">🎯 Tavsiyalar</h3>
+
+                <div class="alert alert-success">
+                    <strong>✅ Eng yaxshi yondashuv:</strong> O'rtacha budget ($5,000-7,000)<br><br>
+                    <strong>Sabablari:</strong><br>
+                    • Tez payback (5-6 oy)<br>
+                    • Yuqori ROI (156% 1-yilda)<br>
+                    • Professional ko'rinish<br>
+                    • Lower risk<br>
+                    • Scalable foundation
+                </div>
+
+                <table style="margin-top: 30px;">
+                    <thead>
+                        <tr>
+                            <th>Scenario</th>
+                            <th>Investment</th>
+                            <th>Risk</th>
+                            <th>ROI (3-yil)</th>
+                            <th>Tavsiya</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Minimal</strong></td>
+                            <td>$250-1,800</td>
+                            <td><span class="badge badge-success">Past</span></td>
+                            <td>4,000%+</td>
+                            <td>Boshlang'ich test uchun</td>
+                        </tr>
+                        <tr class="highlight-row">
+                            <td><strong>O'rtacha</strong></td>
+                            <td>$5,000-7,000</td>
+                            <td><span class="badge badge-warning">O'rtacha</span></td>
+                            <td>1,247%</td>
+                            <td>⭐ ENG YAXSHI</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Optimal</strong></td>
+                            <td>$11,550-31,000</td>
+                            <td><span class="badge badge-danger">Yuqori</span></td>
+                            <td>229%</td>
+                            <td>Investor bilan</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <button class="print-button" onclick="window.print()">🖨️ Print / PDF</button>
+    </div>
+
+    <script>
+        // Tab switching
+        function showTab(tabName) {
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(tabName).classList.add('active');
+        }
+
+        // Charts
+        window.onload = function() {
+            // Cost Breakdown Chart
+            const costCtx = document.getElementById('costBreakdownChart');
+            if (costCtx) {
+                new Chart(costCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Server', 'SMS', 'Marketing', 'Support', 'Other'],
+                        datasets: [{
+                            data: [20, 150, 300, 200, 185],
+                            backgroundColor: ['#667eea', '#764ba2', '#f093fb', '#4facfe', '#43e97b']
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { position: 'bottom' }
+                        }
+                    }
+                });
+            }
+
+            // Revenue Growth Chart
+            const revenueCtx = document.getElementById('revenueGrowthChart');
+            if (revenueCtx) {
+                new Chart(revenueCtx, {
+                    type: 'line',
+                    data: {
+                        labels: ['1-oy', '2-oy', '3-oy', '4-oy', '5-oy', '6-oy', '7-oy', '8-oy', '9-oy', '10-oy', '11-oy', '12-oy'],
+                        datasets: [{
+                            label: 'Konservativ',
+                            data: [1.5, 3.75, 7.5, 11.25, 11.25, 11.25, 15, 15, 15, 18.75, 18.75, 18.75],
+                            borderColor: '#28a745',
+                            backgroundColor: 'rgba(40,167,69,0.1)',
+                            tension: 0.4,
+                            fill: true
+                        }, {
+                            label: 'Optimistik',
+                            data: [3, 7.5, 15, 18.75, 22.5, 22.5, 30, 37.5, 37.5, 45, 45, 45],
+                            borderColor: '#667eea',
+                            backgroundColor: 'rgba(102,126,234,0.1)',
+                            tension: 0.4,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { position: 'top' }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: function(value) {
+                                        return value + 'M';
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Three Year Chart
+            const threeYearCtx = document.getElementById('threeYearChart');
+            if (threeYearCtx) {
+                new Chart(threeYearCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['1-yil', '2-yil', '3-yil'],
+                        datasets: [{
+                            label: 'Yillik Daromad (million so\'m)',
+                            data: [106.5, 450, 975],
+                            backgroundColor: ['#667eea', '#764ba2', '#f093fb']
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: function(value) {
+                                        return value + 'M';
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // ROI Comparison Chart
+            const roiCtx = document.getElementById('roiComparisonChart');
+            if (roiCtx) {
+                new Chart(roiCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['1-yil', '2-yil', '3-yil'],
+                        datasets: [{
+                            label: 'Minimal',
+                            data: [403, 2547, 4037],
+                            backgroundColor: '#28a745'
+                        }, {
+                            label: 'O\'rtacha',
+                            data: [156, 724, 1247],
+                            backgroundColor: '#667eea'
+                        }, {
+                            label: 'Optimal',
+                            data: [12, 98, 229],
+                            backgroundColor: '#ffc107'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { position: 'top' }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: function(value) {
+                                        return value + '%';
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        };
+    </script>
+</body>
+</html>
